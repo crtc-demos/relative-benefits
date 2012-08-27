@@ -1,0 +1,11 @@
+#ifndef ATTR_MASKS_H
+#define ATTR_MASKS_H 1
+
+#define ATTR_MASK_POS		0x01
+#define ATTR_MASK_NORM		0x02
+#define ATTR_MASK_VTXCOLOUR	0x04
+#define ATTR_MASK_TEXCOORD	0x08
+#define ATTR_MASK_BINORM	0x10
+#define ATTR_MASK_TANGENT	0x20
+
+#endif
