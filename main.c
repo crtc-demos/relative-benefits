@@ -24,6 +24,42 @@
 #include "topgum.inc"
 #include "bottomgum.inc"
 
+#include "tl1.inc"
+#include "tl2.inc"
+#include "tl3.inc"
+#include "tl4.inc"
+#include "tl5.inc"
+#include "tl6.inc"
+#include "tl7.inc"
+
+#include "tr1.inc"
+#include "tr2.inc"
+#include "tr3.inc"
+#include "tr4.inc"
+#include "tr5.inc"
+#include "tr6.inc"
+#include "tr7.inc"
+
+#include "bl1.inc"
+#include "bl2.inc"
+#include "bl3.inc"
+#include "bl4.inc"
+#include "bl5.inc"
+#include "bl6.inc"
+#include "bl7.inc"
+#include "bl8.inc"
+
+#include "br1.inc"
+#include "br2.inc"
+#include "br3.inc"
+#include "br4.inc"
+#include "br5.inc"
+#include "br6.inc"
+#include "br7.inc"
+#include "br8.inc"
+
+#include "cylinder.inc"
+
 #define ARRAYLENGTH(X) (sizeof (X) / sizeof ((X)[0]))
 
 static EGLDisplay edpy;
@@ -36,38 +72,107 @@ static GLint u_mvp;
 static GLint u_lightpos;
 
 void
-render_object (GLuint shader_program)
+render_object (int top)
 {
+#define DRAWTOOTH(UNAME, LNAME)						\
+  glVertexAttribPointer (UNAME##_ATTR_POS, 3, GL_FLOAT, GL_FALSE,	\
+			 sizeof (LNAME##_vertex),			\
+			 (void*) LNAME##_vertices[0].pos);		\
+  glEnableVertexAttribArray (UNAME##_ATTR_POS);				\
+									\
+  glVertexAttribPointer (UNAME##_ATTR_NORM, 3, GL_FLOAT, GL_FALSE,	\
+			 sizeof (LNAME##_vertex),			\
+			 (void*) LNAME##_vertices[0].norm);		\
+  glEnableVertexAttribArray (UNAME##_ATTR_NORM);			\
+  									\
+  glDrawArrays (GL_TRIANGLE_STRIP, 0, ARRAYLENGTH (LNAME##_vertices));
   /* Top gum.  */
 
-  glVertexAttribPointer (TOPGUM_ATTR_POS, 3, GL_FLOAT, GL_FALSE,
-			 sizeof (topgum_vertex),
-			 (void*) topgum_vertices[0].pos);
-  glEnableVertexAttribArray (TOPGUM_ATTR_POS);
-  
-  glVertexAttribPointer (TOPGUM_ATTR_NORM, 3, GL_FLOAT, GL_FALSE,
-			 sizeof (topgum_vertex),
-			 (void*) topgum_vertices[0].norm);
-  glEnableVertexAttribArray (TOPGUM_ATTR_NORM);
-  
+  if (top)
+    {
+      glVertexAttribPointer (TOPGUM_ATTR_POS, 3, GL_FLOAT, GL_FALSE,
+			     sizeof (topgum_vertex),
+			     (void*) topgum_vertices[0].pos);
+      glEnableVertexAttribArray (TOPGUM_ATTR_POS);
+
+      glVertexAttribPointer (TOPGUM_ATTR_NORM, 3, GL_FLOAT, GL_FALSE,
+			     sizeof (topgum_vertex),
+			     (void*) topgum_vertices[0].norm);
+      glEnableVertexAttribArray (TOPGUM_ATTR_NORM);
+
+      /*printf ("draw array, length %d\n", ARRAYLENGTH (topgum_vertices));*/
+      glDrawArrays (GL_TRIANGLE_STRIP, 0, ARRAYLENGTH (topgum_vertices));
+
+      DRAWTOOTH(TL1, tl1)
+      DRAWTOOTH(TL2, tl2)
+      DRAWTOOTH(TL3, tl3)
+      DRAWTOOTH(TL4, tl4)
+      DRAWTOOTH(TL5, tl5)
+      DRAWTOOTH(TL6, tl6)
+      DRAWTOOTH(TL7, tl7)
+
+      DRAWTOOTH(TR1, tr1)
+      DRAWTOOTH(TR2, tr2)
+      DRAWTOOTH(TR3, tr3)
+      DRAWTOOTH(TR4, tr4)
+      DRAWTOOTH(TR5, tr5)
+      DRAWTOOTH(TR6, tr6)
+      DRAWTOOTH(TR7, tr7)
+    }
+  else
+    {
+      /* Bottom gum.  */
+      /*glBindAttribLocation (shader_program, BOTTOMGUM_ATTR_POS, "a_position");
+      glBindAttribLocation (shader_program, BOTTOMGUM_ATTR_NORM, "a_normal");*/
+
+      glVertexAttribPointer (BOTTOMGUM_ATTR_POS, 3, GL_FLOAT, GL_FALSE,
+			     sizeof (bottomgum_vertex),
+			     (void*) bottomgum_vertices[0].pos);
+      glEnableVertexAttribArray (BOTTOMGUM_ATTR_POS);
+
+      glVertexAttribPointer (BOTTOMGUM_ATTR_NORM, 3, GL_FLOAT, GL_FALSE,
+			     sizeof (bottomgum_vertex),
+			     (void*) bottomgum_vertices[0].norm);
+      glEnableVertexAttribArray (BOTTOMGUM_ATTR_NORM);
+
+      glDrawArrays (GL_TRIANGLE_STRIP, 0, ARRAYLENGTH (bottomgum_vertices));
+
+      DRAWTOOTH(BL1, bl1)
+      DRAWTOOTH(BL2, bl2)
+      DRAWTOOTH(BL3, bl3)
+      DRAWTOOTH(BL4, bl4)
+      DRAWTOOTH(BL5, bl5)
+      DRAWTOOTH(BL6, bl6)
+      DRAWTOOTH(BL7, bl7)
+      DRAWTOOTH(BL8, bl8)
+
+      DRAWTOOTH(BR1, br1)
+      DRAWTOOTH(BR2, br2)
+      DRAWTOOTH(BR3, br3)
+      DRAWTOOTH(BR4, br4)
+      DRAWTOOTH(BR5, br5)
+      DRAWTOOTH(BR6, br6)
+      DRAWTOOTH(BR7, br7)
+      DRAWTOOTH(BR8, br8)
+    }
+#undef DRAWTOOTH
+}
+
+void
+glass (void)
+{
+  glVertexAttribPointer (GLASS_ATTR_POS, 3, GL_FLOAT, GL_FALSE,
+			 sizeof (glass_vertex),
+			 (void*) glass_vertices[0].pos);
+  glEnableVertexAttribArray (GLASS_ATTR_POS);
+
+  glVertexAttribPointer (GLASS_ATTR_NORM, 3, GL_FLOAT, GL_FALSE,
+			 sizeof (glass_vertex),
+			 (void*) glass_vertices[0].norm);
+  glEnableVertexAttribArray (GLASS_ATTR_NORM);
+
   /*printf ("draw array, length %d\n", ARRAYLENGTH (topgum_vertices));*/
-  glDrawArrays (GL_TRIANGLE_STRIP, 0, ARRAYLENGTH (topgum_vertices));
-
-  /* Bottom gum.  */
-  /*glBindAttribLocation (shader_program, BOTTOMGUM_ATTR_POS, "a_position");
-  glBindAttribLocation (shader_program, BOTTOMGUM_ATTR_NORM, "a_normal");*/
-
-  glVertexAttribPointer (BOTTOMGUM_ATTR_POS, 3, GL_FLOAT, GL_FALSE,
-			 sizeof (bottomgum_vertex),
-			 (void*) bottomgum_vertices[0].pos);
-  glEnableVertexAttribArray (BOTTOMGUM_ATTR_POS);
-  
-  glVertexAttribPointer (BOTTOMGUM_ATTR_NORM, 3, GL_FLOAT, GL_FALSE,
-			 sizeof (bottomgum_vertex),
-			 (void*) bottomgum_vertices[0].norm);
-  glEnableVertexAttribArray (BOTTOMGUM_ATTR_NORM);
-  
-  glDrawArrays (GL_TRIANGLE_STRIP, 0, ARRAYLENGTH (bottomgum_vertices));
+  glDrawArrays (GL_TRIANGLE_STRIP, 0, ARRAYLENGTH (glass_vertices));
 }
 
 int
@@ -220,10 +325,25 @@ main (int argc, char *argv[])
 
   while (!quit)
     {
+      float angle2;
+      GLfloat chomp[16];
+      GLfloat xlate[16];
+      static int alt = 0;
+
       glClearColor (0, 0, 0, 1);
       glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      transform_rotate4 (model, ident, 0, 1, 0, angle);
+      angle2 = 0.5 + 0.5 * sinf (angle * 10);
+
+      transform_translate4_mat (xlate, 0, 0, 3.5);
+      transform_rotate4_mat (chomp, 1, 0, 0, angle2 / 2);
+      
+      transform_mul4 (model, chomp, xlate);
+      transform_translate4_mat (xlate, 0, 0, -3.5);
+      transform_mul4 (model, xlate, model);
+      
+      transform_rotate4_mat (xlate, 0, 1, 0, angle);
+      transform_mul4 (model, xlate, model);
 
       transform_mul4 (modelview, view, model);
       transform_invert4 (inv_modelview, modelview);
@@ -231,10 +351,42 @@ main (int argc, char *argv[])
       transform_mul4 (mvp, perspective, modelview);
       glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);
 
-      render_object (shaderProgram);
+      render_object (0);
+
+      transform_translate4_mat (xlate, 0, 0, 3.5);
+      transform_rotate4_mat (chomp, 1, 0, 0, -angle2 / 3);
+      
+      transform_mul4 (model, chomp, xlate);
+      transform_translate4_mat (xlate, 0, 0, -3.5);
+      transform_mul4 (model, xlate, model);
+      
+      transform_rotate4_mat (xlate, 0, 1, 0, angle);
+      transform_mul4 (model, xlate, model);
+      
+      transform_mul4 (modelview, view, model);
+      transform_invert4 (inv_modelview, modelview);
+      transform_point4 (&light0_t, inv_modelview, &light0);
+      transform_mul4 (mvp, perspective, modelview);
+      glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);
+
+      render_object (1);
+
+      /*if (alt == 0)
+        {
+	  transform_identity4 (model);
+
+	  transform_mul4 (modelview, view, model);
+	  transform_invert4 (inv_modelview, modelview);
+	  transform_point4 (&light0_t, inv_modelview, &light0);
+	  transform_mul4 (mvp, perspective, modelview);
+	  glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);
+
+	  glass ();
+	}
+      alt = !alt;*/
 
       eglSwapBuffers (edpy, esfc);
-      angle += 0.01;
+      angle += 0.02;
     }
 
   eglDestroyContext(edpy, ectxt);

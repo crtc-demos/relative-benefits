@@ -1,10 +1,24 @@
 # This is a makefile.
 
-	CC :=		gcc
+	ifeq ($(CROSS),true)
+	SYSROOT :=	/home/jules/stuff-in-hiding/r-pi/piroot
+	CFLAGS :=	-O2 -g -Wall --sysroot=$(SYSROOT)
+	CC :=		arm-bcm2708hardfp-linux-gnueabi-gcc
+	else
+	SYSROOT :=
 	CFLAGS :=	-O2 -g -Wall
-	LIBS :=		-L/usr/X11R6/lib -L/opt/vc/lib -lm \
-			-lGLESv2 -lEGL -lpng
-	INCLUDE :=	-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads
+	CC :=		gcc
+	endif
+
+	LIBS :=		-L$(SYSROOT)/usr/X11R6/lib -L$(SYSROOT)/opt/vc/lib \
+			-L$(SYSROOT)/lib -L$(SYSROOT)/usr/lib \
+			-L$(SYSROOT)/usr/lib/arm-linux-gnueabihf -lm -lGLESv2 \
+			-lEGL -lpng -Wl,-dynamic-linker,$(SYSROOT)/lib/arm-linux-gnueabihf/ld-linux.so.3
+
+	INCLUDE :=	-I$(SYSROOT)/opt/vc/include \
+			-I$(SYSROOT)/opt/vc/include/interface/vcos/pthreads \
+			-I$(SYSROOT)/usr/include/arm-linux-gnueabihf
+
 	OBJ = 		transform.o shader.o main.o 
 
 	LDFLAGS = 	-g

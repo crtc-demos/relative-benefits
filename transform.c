@@ -404,6 +404,7 @@ void transform_identity4(GLfloat out[16])
 void transform_mul4(GLfloat out[16], GLfloat a[16], GLfloat b[16])
 {
   int i, j, k;
+  GLfloat tmp[16];
   
   for (i=0; i<4; i++)
   {
@@ -414,9 +415,11 @@ void transform_mul4(GLfloat out[16], GLfloat a[16], GLfloat b[16])
       {
         sum += a[j+k*4] * b[i*4+k];
       }
-      out[j+i*4] = sum;
+      tmp[j+i*4] = sum;
     }
   }
+  
+  memcpy (out, tmp, sizeof (GLfloat) * 16);
 }
 
 /* GL-equivalent frustum */
@@ -488,12 +491,21 @@ void transform_translate4 (GLfloat dst[16], GLfloat mat[16],
 #endif
 }
 
+void transform_translate4_mat (GLfloat dst[16], GLfloat dx, GLfloat dy,
+			       GLfloat dz)
+{
+  dst[0] = 1; dst[4] = 0; dst[8] = 0; dst[12] = dx;
+  dst[1] = 0; dst[5] = 1; dst[9] = 0; dst[13] = dy;
+  dst[2] = 0; dst[6] = 0; dst[10] = 1; dst[14] = dz;
+  dst[3] = 0; dst[7] = 0; dst[11] = 0; dst[15] = 1;
+}
+
 /* GL-equivalent lookat */
 void transform_lookat4 (GLfloat dst[16], const ttd_point3d* eye,
 			const ttd_point3d* centre, const ttd_point3d* up)
 {
   ttd_point3d l, s, uq;
-  GLfloat mat[16];
+  GLfloat mat[16] /*, tmp[16]*/;
 
   transform_subvec(&l, centre, eye);
   transform_normalize(&l, &l);
@@ -506,7 +518,7 @@ void transform_lookat4 (GLfloat dst[16], const ttd_point3d* eye,
   mat[4] = s.y; mat[5] = uq.y; mat[6] = -l.y;  mat[7] = 0;
   mat[8] = s.z; mat[9] = uq.z; mat[10] = -l.z; mat[11] = 0;
   mat[12] = 0;  mat[13] = 0;   mat[14] = 0;    mat[15] = 1;
-    
+
   transform_translate4 (dst, mat, -eye->x, -eye->y, -eye->z);
 
   /*for (i = 0; i < 16; i++)
@@ -522,7 +534,7 @@ void transform_rotate4 (GLfloat dst[16], GLfloat mat[16], GLfloat ax,
   ttd_point3d axis = { ax, ay, az };
   ttd_matrix tmp;
   GLfloat rot[16];
-    
+
   transform_genmatrix (&tmp, &axis, angle);
 
   rot[0] = tmp.col[0].x;
@@ -546,6 +558,35 @@ void transform_rotate4 (GLfloat dst[16], GLfloat mat[16], GLfloat ax,
   rot[15] = 1;
   
   transform_mul4 (dst, rot, mat);
+}
+
+void transform_rotate4_mat (GLfloat dst[16], GLfloat ax, GLfloat ay, GLfloat az,
+			GLfloat angle)
+{
+  ttd_point3d axis = { ax, ay, az };
+  ttd_matrix tmp;
+    
+  transform_genmatrix (&tmp, &axis, angle);
+
+  dst[0] = tmp.col[0].x;
+  dst[4] = tmp.col[1].x;
+  dst[8] = tmp.col[2].x;
+  dst[12] = 0;
+
+  dst[1] = tmp.col[0].y;
+  dst[5] = tmp.col[1].y;
+  dst[9] = tmp.col[2].y;
+  dst[13] = 0;
+  
+  dst[2] = tmp.col[0].z;
+  dst[6] = tmp.col[1].z;
+  dst[10] = tmp.col[2].z;
+  dst[14] = 0;
+  
+  dst[3] = 0;
+  dst[7] = 0;
+  dst[11] = 0;
+  dst[15] = 1;
 }
 
 void transform_rot_only4 (GLfloat dst[16], GLfloat src[16])

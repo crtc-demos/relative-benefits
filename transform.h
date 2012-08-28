@@ -76,8 +76,15 @@ extern void transform_translate4 (GLfloat dst[16], GLfloat mat[16],
 				  GLfloat dx, GLfloat dy, GLfloat dz);
 
 extern void transform_rotate4 (GLfloat dst[16], GLfloat mat[16],
-			       GLfloat ax, GLfloat ay, GLfloat az,
-			       GLfloat angle);
+                               GLfloat ax, GLfloat ay, GLfloat az,
+                               GLfloat angle);
+
+extern void transform_translate4_mat (GLfloat dst[16],
+				      GLfloat dx, GLfloat dy, GLfloat dz);
+
+extern void transform_rotate4_mat (GLfloat dst[16],
+				   GLfloat ax, GLfloat ay, GLfloat az,
+				   GLfloat angle);
 
 extern void transform_rot_only4 (GLfloat dst[16], GLfloat src[16]);
 
