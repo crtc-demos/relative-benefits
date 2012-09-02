@@ -3736,6 +3736,16 @@ static tr3_vertex tr3_vertices[] = {
     { -0.321421, -0.634724, -0.702689 },
   },
 };
-static const unsigned int tr3_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TR3_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TR3_ATTR_POS 0
+#define TR3_DATA_POS (void*) tr3_vertices[0].pos
 #define TR3_ATTR_NORM 1
+#define TR3_DATA_NORM (void*) tr3_vertices[0].norm
+#define TR3_ATTR_COLOUR -1
+#define TR3_DATA_COLOUR (void*) 0
+#define TR3_ATTR_TEXCOORD -1
+#define TR3_DATA_TEXCOORD (void*) 0
+#define TR3_ATTR_BINORM -1
+#define TR3_DATA_BINORM (void*) 0
+#define TR3_ATTR_TANGENT -1
+#define TR3_DATA_TANGENT (void*) 0

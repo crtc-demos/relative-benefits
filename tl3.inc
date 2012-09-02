@@ -3736,6 +3736,16 @@ static tl3_vertex tl3_vertices[] = {
     { -0.226569, -0.643757, -0.730857 },
   },
 };
-static const unsigned int tl3_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TL3_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TL3_ATTR_POS 0
+#define TL3_DATA_POS (void*) tl3_vertices[0].pos
 #define TL3_ATTR_NORM 1
+#define TL3_DATA_NORM (void*) tl3_vertices[0].norm
+#define TL3_ATTR_COLOUR -1
+#define TL3_DATA_COLOUR (void*) 0
+#define TL3_ATTR_TEXCOORD -1
+#define TL3_DATA_TEXCOORD (void*) 0
+#define TL3_ATTR_BINORM -1
+#define TL3_DATA_BINORM (void*) 0
+#define TL3_ATTR_TANGENT -1
+#define TL3_DATA_TANGENT (void*) 0

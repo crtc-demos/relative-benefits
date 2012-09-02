@@ -3736,6 +3736,16 @@ static bl5_vertex bl5_vertices[] = {
     { -0.432173, -0.901181, -0.032380 },
   },
 };
-static const unsigned int bl5_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define BL5_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define BL5_ATTR_POS 0
+#define BL5_DATA_POS (void*) bl5_vertices[0].pos
 #define BL5_ATTR_NORM 1
+#define BL5_DATA_NORM (void*) bl5_vertices[0].norm
+#define BL5_ATTR_COLOUR -1
+#define BL5_DATA_COLOUR (void*) 0
+#define BL5_ATTR_TEXCOORD -1
+#define BL5_DATA_TEXCOORD (void*) 0
+#define BL5_ATTR_BINORM -1
+#define BL5_DATA_BINORM (void*) 0
+#define BL5_ATTR_TANGENT -1
+#define BL5_DATA_TANGENT (void*) 0

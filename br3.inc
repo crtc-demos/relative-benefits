@@ -3736,6 +3736,16 @@ static br3_vertex br3_vertices[] = {
     { -0.208197, -0.954924, -0.211463 },
   },
 };
-static const unsigned int br3_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define BR3_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define BR3_ATTR_POS 0
+#define BR3_DATA_POS (void*) br3_vertices[0].pos
 #define BR3_ATTR_NORM 1
+#define BR3_DATA_NORM (void*) br3_vertices[0].norm
+#define BR3_ATTR_COLOUR -1
+#define BR3_DATA_COLOUR (void*) 0
+#define BR3_ATTR_TEXCOORD -1
+#define BR3_DATA_TEXCOORD (void*) 0
+#define BR3_ATTR_BINORM -1
+#define BR3_DATA_BINORM (void*) 0
+#define BR3_ATTR_TANGENT -1
+#define BR3_DATA_TANGENT (void*) 0

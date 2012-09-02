@@ -3736,6 +3736,16 @@ static tl6_vertex tl6_vertices[] = {
     { -0.038636, -0.968963, 0.244148 },
   },
 };
-static const unsigned int tl6_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TL6_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TL6_ATTR_POS 0
+#define TL6_DATA_POS (void*) tl6_vertices[0].pos
 #define TL6_ATTR_NORM 1
+#define TL6_DATA_NORM (void*) tl6_vertices[0].norm
+#define TL6_ATTR_COLOUR -1
+#define TL6_DATA_COLOUR (void*) 0
+#define TL6_ATTR_TEXCOORD -1
+#define TL6_DATA_TEXCOORD (void*) 0
+#define TL6_ATTR_BINORM -1
+#define TL6_DATA_BINORM (void*) 0
+#define TL6_ATTR_TANGENT -1
+#define TL6_DATA_TANGENT (void*) 0

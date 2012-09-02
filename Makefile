@@ -19,7 +19,8 @@
 			-I$(SYSROOT)/opt/vc/include/interface/vcos/pthreads \
 			-I$(SYSROOT)/usr/include/arm-linux-gnueabihf
 
-	OBJ = 		transform.o shader.o main.o 
+	OBJ = 		transform.o shader.o readpng.o objects.o sundown.o \
+			chompy.o main.o 
 
 	LDFLAGS = 	-g
 

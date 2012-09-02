@@ -3736,6 +3736,16 @@ static tl5_vertex tl5_vertices[] = {
     { -0.032838, -0.974181, 0.223334 },
   },
 };
-static const unsigned int tl5_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TL5_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TL5_ATTR_POS 0
+#define TL5_DATA_POS (void*) tl5_vertices[0].pos
 #define TL5_ATTR_NORM 1
+#define TL5_DATA_NORM (void*) tl5_vertices[0].norm
+#define TL5_ATTR_COLOUR -1
+#define TL5_DATA_COLOUR (void*) 0
+#define TL5_ATTR_TEXCOORD -1
+#define TL5_DATA_TEXCOORD (void*) 0
+#define TL5_ATTR_BINORM -1
+#define TL5_DATA_BINORM (void*) 0
+#define TL5_ATTR_TANGENT -1
+#define TL5_DATA_TANGENT (void*) 0

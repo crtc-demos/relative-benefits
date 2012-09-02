@@ -72,6 +72,10 @@ extern void transform_perspective4 (GLfloat mat[16], GLfloat fovy,
 				    GLfloat aspect, GLfloat nearz,
 				    GLfloat farz);
 
+extern void transform_ortho4 (GLfloat mat[16], GLfloat left, GLfloat right,
+			      GLfloat bottom, GLfloat top, GLfloat nearval,
+			      GLfloat farval);
+
 extern void transform_translate4 (GLfloat dst[16], GLfloat mat[16],
 				  GLfloat dx, GLfloat dy, GLfloat dz);
 

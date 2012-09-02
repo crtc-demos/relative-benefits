@@ -470,6 +470,20 @@ void transform_perspective4 (GLfloat mat[16], GLfloat fovy, GLfloat aspect,
   mat[15] = 0;
 }
 
+void transform_ortho4 (GLfloat mat[16], GLfloat left, GLfloat right,
+		       GLfloat bottom, GLfloat top, GLfloat near,
+		       GLfloat far)
+{
+  memset (mat, 0, sizeof (GLfloat) * 16);
+  mat[0] = 2.0 / (right - left);
+  mat[5] = 2.0 / (top - bottom);
+  mat[10] = -2.0 / (far - near);
+  mat[12] = -(right + left) / (right - left);
+  mat[13] = -(top + bottom) / (top - bottom);
+  mat[14] = -(far + near) / (far - near);
+  mat[15] = 1.0;
+}
+
 void transform_translate4 (GLfloat dst[16], GLfloat mat[16],
 			   GLfloat dx, GLfloat dy, GLfloat dz)
 {

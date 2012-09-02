@@ -3736,6 +3736,16 @@ static tl7_vertex tl7_vertices[] = {
     { -0.026917, -0.966826, 0.253945 },
   },
 };
-static const unsigned int tl7_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TL7_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TL7_ATTR_POS 0
+#define TL7_DATA_POS (void*) tl7_vertices[0].pos
 #define TL7_ATTR_NORM 1
+#define TL7_DATA_NORM (void*) tl7_vertices[0].norm
+#define TL7_ATTR_COLOUR -1
+#define TL7_DATA_COLOUR (void*) 0
+#define TL7_ATTR_TEXCOORD -1
+#define TL7_DATA_TEXCOORD (void*) 0
+#define TL7_ATTR_BINORM -1
+#define TL7_DATA_BINORM (void*) 0
+#define TL7_ATTR_TANGENT -1
+#define TL7_DATA_TANGENT (void*) 0

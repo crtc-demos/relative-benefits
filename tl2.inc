@@ -3736,6 +3736,16 @@ static tl2_vertex tl2_vertices[] = {
     { 0.333170, -0.656606, -0.676626 },
   },
 };
-static const unsigned int tl2_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TL2_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TL2_ATTR_POS 0
+#define TL2_DATA_POS (void*) tl2_vertices[0].pos
 #define TL2_ATTR_NORM 1
+#define TL2_DATA_NORM (void*) tl2_vertices[0].norm
+#define TL2_ATTR_COLOUR -1
+#define TL2_DATA_COLOUR (void*) 0
+#define TL2_ATTR_TEXCOORD -1
+#define TL2_DATA_TEXCOORD (void*) 0
+#define TL2_ATTR_BINORM -1
+#define TL2_DATA_BINORM (void*) 0
+#define TL2_ATTR_TANGENT -1
+#define TL2_DATA_TANGENT (void*) 0

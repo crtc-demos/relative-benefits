@@ -3736,6 +3736,16 @@ static tr4_vertex tr4_vertices[] = {
     { 0.162633, -0.974181, 0.156529 },
   },
 };
-static const unsigned int tr4_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define TR4_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define TR4_ATTR_POS 0
+#define TR4_DATA_POS (void*) tr4_vertices[0].pos
 #define TR4_ATTR_NORM 1
+#define TR4_DATA_NORM (void*) tr4_vertices[0].norm
+#define TR4_ATTR_COLOUR -1
+#define TR4_DATA_COLOUR (void*) 0
+#define TR4_ATTR_TEXCOORD -1
+#define TR4_DATA_TEXCOORD (void*) 0
+#define TR4_ATTR_BINORM -1
+#define TR4_DATA_BINORM (void*) 0
+#define TR4_ATTR_TANGENT -1
+#define TR4_DATA_TANGENT (void*) 0

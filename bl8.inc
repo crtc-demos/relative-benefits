@@ -3736,6 +3736,16 @@ static bl8_vertex bl8_vertices[] = {
     { 0.295785, -0.954344, 0.040956 },
   },
 };
-static const unsigned int bl8_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define BL8_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define BL8_ATTR_POS 0
+#define BL8_DATA_POS (void*) bl8_vertices[0].pos
 #define BL8_ATTR_NORM 1
+#define BL8_DATA_NORM (void*) bl8_vertices[0].norm
+#define BL8_ATTR_COLOUR -1
+#define BL8_DATA_COLOUR (void*) 0
+#define BL8_ATTR_TEXCOORD -1
+#define BL8_DATA_TEXCOORD (void*) 0
+#define BL8_ATTR_BINORM -1
+#define BL8_DATA_BINORM (void*) 0
+#define BL8_ATTR_TANGENT -1
+#define BL8_DATA_TANGENT (void*) 0

@@ -3736,6 +3736,16 @@ static br7_vertex br7_vertices[] = {
     { -0.295450, -0.954100, -0.048524 },
   },
 };
-static const unsigned int br7_attrs = ATTR_MASK_POS | ATTR_MASK_NORM;
+#define BR7_ATTRS (ATTR_MASK_POS | ATTR_MASK_NORM)
 #define BR7_ATTR_POS 0
+#define BR7_DATA_POS (void*) br7_vertices[0].pos
 #define BR7_ATTR_NORM 1
+#define BR7_DATA_NORM (void*) br7_vertices[0].norm
+#define BR7_ATTR_COLOUR -1
+#define BR7_DATA_COLOUR (void*) 0
+#define BR7_ATTR_TEXCOORD -1
+#define BR7_DATA_TEXCOORD (void*) 0
+#define BR7_ATTR_BINORM -1
+#define BR7_DATA_BINORM (void*) 0
+#define BR7_ATTR_TANGENT -1
+#define BR7_DATA_TANGENT (void*) 0
