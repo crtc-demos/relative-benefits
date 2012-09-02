@@ -14,8 +14,9 @@ void main ()
   vec4 colour = texture2D (s_texture, v_texcoord);
   if (colour == vec4 (1.0, 0.0, 1.0, 1.0))
     {
-      float g = dist (v_texcoord[0], v_texcoord[1], 0.5, u_time / 10.0);
-      gl_FragColor = vec4 (1.0, 1.0 - g, 0.0, 1.0);
+      float g = smoothstep (0.05, 0.06, dist (v_texcoord[0], v_texcoord[1], 0.5, u_time / 10.0));
+      gl_FragColor = mix (vec4 (1.0, 1.0, 0.0, 1.0),
+			  vec4 (0.0, 0.8, 1.0, 1.0), g);
     }
   else
     gl_FragColor = colour;
