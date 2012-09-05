@@ -16,11 +16,12 @@ sundown_info sundown_info_0;
 void
 preinit_sundown (void)
 {
+  int alpha;
   printf ("Loading budleigh.png...\n");
   sundown_info_0.image_data = readpng_image ("budleigh.png",
-    &sundown_info_0.image_width, &sundown_info_0.image_height);
+    &sundown_info_0.image_width, &sundown_info_0.image_height, &alpha);
   sundown_info_0.texhandle = readpng_bindgl2d (sundown_info_0.image_data,
-    sundown_info_0.image_width, sundown_info_0.image_height);
+    sundown_info_0.image_width, sundown_info_0.image_height, alpha);
   free (sundown_info_0.image_data);
   printf ("done.\n");
 }

@@ -14,7 +14,7 @@ static void read_row_callback(png_structp png_ptr, png_uint_32 row, int pass)
   // fprintf(stderr, "*");
 }
 
-char* readpng_image(char* filename, int* width, int* height)
+char* readpng_image(char* filename, int* width, int* height, int *alpha)
 {
   FILE* fp = fopen(filename, "rb");
   const int number = 8;
@@ -106,9 +106,11 @@ char* readpng_image(char* filename, int* width, int* height)
     {
     case PNG_COLOR_TYPE_RGB:
       nchannels = 3;
+      *alpha = 0;
       break;
     case PNG_COLOR_TYPE_RGBA:
       nchannels = 4;
+      *alpha = 1;
       break;
     default:
       abort ();
@@ -126,13 +128,11 @@ char* readpng_image(char* filename, int* width, int* height)
   png_read_end(png_ptr, end_info);
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
   
-  fprintf(stderr, "\n");
-
-  pixels = malloc(3*image_width*image_height);
+  pixels = malloc (nchannels * image_width * image_height);
   
-  for (y=0; y<image_height; y++)
+  for (y = 0; y < image_height; y++)
   {
-    char* destrow = &pixels[y*image_width*3];
+    char* destrow = &pixels[y * image_width * nchannels];
     unsigned char* srcrow = row_pointers[y];
 
     switch (colour_type)
@@ -142,19 +142,19 @@ char* readpng_image(char* filename, int* width, int* height)
 	  destrow[x] = srcrow[x];
 	break;
       case PNG_COLOR_TYPE_RGBA:
-	for (x = 0; x < image_width * 3; x++)
-	  destrow[x] = srcrow[(x * 4) / 3];
+	for (x = 0; x < image_width * 4; x++)
+	  destrow[x] = srcrow[x];
 	break;
       default:
         abort ();
       }
   }
   
-  for (y=0; y<image_height; y++)
+  for (y = 0; y < image_height; y++)
   {
-    free(row_pointers[y]);
+    free (row_pointers[y]);
   }
-  free(row_pointers);
+  free (row_pointers);
 
   if (width) *width = image_width;
   if (height) *height = image_height;
@@ -162,17 +162,18 @@ char* readpng_image(char* filename, int* width, int* height)
   return pixels;
 }
 
-GLuint readpng_bindgl2d(char* pixels, int width, int height)
+GLuint readpng_bindgl2d(char* pixels, int width, int height, int alpha)
 {
   GLuint texture;
+  GLenum format = alpha ? GL_RGBA : GL_RGB;
   
   glGenTextures (1, &texture);
   glBindTexture (GL_TEXTURE_2D, texture);
   
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   
-  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-		GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  glTexImage2D (GL_TEXTURE_2D, 0, format, width, height, 0, format,
+		GL_UNSIGNED_BYTE, pixels);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   

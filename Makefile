@@ -13,14 +13,17 @@
 	LIBS :=		-L$(SYSROOT)/usr/X11R6/lib -L$(SYSROOT)/opt/vc/lib \
 			-L$(SYSROOT)/lib -L$(SYSROOT)/usr/lib \
 			-L$(SYSROOT)/usr/lib/arm-linux-gnueabihf -lm -lGLESv2 \
-			-lEGL -lpng -Wl,-dynamic-linker,$(SYSROOT)/lib/arm-linux-gnueabihf/ld-linux.so.3
+			-lEGL -lpng -Wl,-dynamic-linker,$(SYSROOT)/lib/arm-linux-gnueabihf/ld-linux.so.3 \
+			-L$(SYSROOT)/opt/vc/src/hello_pi/libs/ilclient \
+			-lopenmaxil -lilclient
 
 	INCLUDE :=	-I$(SYSROOT)/opt/vc/include \
 			-I$(SYSROOT)/opt/vc/include/interface/vcos/pthreads \
-			-I$(SYSROOT)/usr/include/arm-linux-gnueabihf
+			-I$(SYSROOT)/usr/include/arm-linux-gnueabihf \
+			-I$(SYSROOT)/opt/vc/src/hello_pi/libs/ilclient
 
 	OBJ = 		transform.o shader.o readpng.o objects.o sundown.o \
-			chompy.o main.o 
+			chompy.o adpcm.o omxaudio.o main.o 
 
 	LDFLAGS = 	-g
 

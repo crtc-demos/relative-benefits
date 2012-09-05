@@ -15,9 +15,13 @@
 
 #include <bcm_host.h>
 
+#include "IL/OMX_Broadcom.h"
+#include "interface/vcos/vcos.h"
+
 #include "vecmat.h"
 #include "transform.h"
 #include "shader.h"
+#include "omxaudio.h"
 
 #include "attr_masks.h"
 #include "objects.h"
@@ -206,11 +210,23 @@ main (int argc, char *argv[])
   disp.width = width;
   disp.height = height;
 
+  omxaudio_init ();
+  {
+    OMX_ERRORTYPE err = omxaudio_load ("/home/pi/pidemo/crtc3.wav");
+    if (err != OMX_ErrorNone)
+      {
+        fprintf (stderr, "OMX playback failed to initialise (%x)\n", err);
+	exit (1);
+      }
+  }
+
   start_time = gettime ();
 
 #ifdef SKIP_TO_TIME
   offset_time = SKIP_TO_TIME;
 #endif
+  
+  omxaudio_play ();
 
   while (!quit)
     {
