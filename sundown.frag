@@ -24,14 +24,18 @@ vec4 sun2 (void)
   float y = u_time / 10.0 - v_texcoord[1];
   float len = x * x + y * y;
   float pi = 3.141592654;
-  float d = step (0.5, fract (atan (y, x) * 10.0 / (2.0 * pi)));
-  float param = min (d, step (3.0, len));
+  float d = step (0.5, fract (u_time + atan (y, x) * 10.0 / (2.0 * pi)));
+  float param = max (d, 1.0 - step (0.025, len));
   return vec4 (param, param, param, param);
 }
 
 void main ()
 {
   vec4 colour = texture2D (s_texture, v_texcoord);
-  vec4 sky = sun2 ();
+  vec4 sky;
+  if (fract (u_time * 0.5) < 0.5)
+    sky = sun1 ();
+  else
+    sky = sun2 ();
   gl_FragColor = mix (sky, colour.rgba, colour.a);
 }

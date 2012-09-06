@@ -83,3 +83,7 @@ INSTANTIATE (br8_obj, BR8, br8);
 #include "cylinder.inc"
 
 INSTANTIATE (glass_obj, GLASS, glass);
+
+#include "table.inc"
+
+INSTANTIATE (table_obj, TABLE, table);

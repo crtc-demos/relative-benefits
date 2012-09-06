@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.58.1 r38019</authoring_tool>
     </contributor>
-    <created>2012-09-02T16:51:15</created>
-    <modified>2012-09-02T16:51:15</modified>
+    <created>2012-09-06T00:27:08</created>
+    <modified>2012-09-06T00:27:08</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -164,8 +164,55 @@
       </extra>
     </light>
   </library_lights>
+  <library_images>
+    <image id="wood_png" name="wood_png">
+      <init_from>wood.png</init_from>
+    </image>
+  </library_images>
   <library_effects>
-    <effect id="default-effect">
+    <effect id="Material-effect">
+      <profile_COMMON>
+        <newparam sid="wood_png-surface">
+          <surface type="2D">
+            <init_from>wood_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="wood_png-sampler">
+          <sampler2D>
+            <source>wood_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="wood_png-sampler" texcoord="UVTex"/>
+            </diffuse>
+            <specular>
+              <color>0.5 0.5 0.5 1</color>
+            </specular>
+            <shininess>
+              <float>50</float>
+            </shininess>
+            <index_of_refraction>
+              <float>1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+        <extra>
+          <technique profile="GOOGLEEARTH">
+            <double_sided>1</double_sided>
+          </technique>
+        </extra>
+      </profile_COMMON>
+      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
+    </effect>
+    <effect id="glass-effect">
       <profile_COMMON>
         <technique sid="common">
           <phong>
@@ -202,11 +249,58 @@
     </effect>
   </library_effects>
   <library_materials>
-    <material id="default-material" name="default">
-      <instance_effect url="#default-effect"/>
+    <material id="Material-material" name="Material">
+      <instance_effect url="#Material-effect"/>
+    </material>
+    <material id="glass-material" name="glass">
+      <instance_effect url="#glass-effect"/>
     </material>
   </library_materials>
   <library_geometries>
+    <geometry id="Plane-mesh">
+      <mesh>
+        <source id="Plane-mesh-positions">
+          <float_array id="Plane-mesh-positions-array" count="12">45.0965 43.47965 -5.713585 45.0965 -47.11945 -5.713585 -45.50262 -47.11945 -5.713585 -45.5026 43.47967 -5.713585</float_array>
+          <technique_common>
+            <accessor source="#Plane-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane-mesh-normals">
+          <float_array id="Plane-mesh-normals-array" count="3">0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Plane-mesh-normals-array" count="1" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane-mesh-map-0">
+          <float_array id="Plane-mesh-map-0-array" count="8">0 2.38419e-7 0.9999998 0 0.9999999 0.9999999 0 1</float_array>
+          <technique_common>
+            <accessor source="#Plane-mesh-map-0-array" count="4" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Plane-mesh-vertices">
+          <input semantic="POSITION" source="#Plane-mesh-positions"/>
+        </vertices>
+        <polylist material="Material1" count="1">
+          <input semantic="VERTEX" source="#Plane-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Plane-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Plane-mesh-map-0" offset="2" set="0"/>
+          <vcount>4 </vcount>
+          <p>0 0 0 3 0 1 2 0 2 1 0 3</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
     <geometry id="cylinder1-mesh">
       <mesh>
         <source id="cylinder1-mesh-positions">
@@ -251,7 +345,7 @@
         <vertices id="cylinder1-mesh-vertices">
           <input semantic="POSITION" source="#cylinder1-mesh-positions"/>
         </vertices>
-        <polylist material="default1" count="596">
+        <polylist material="glass1" count="596">
           <input semantic="VERTEX" source="#cylinder1-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#cylinder1-mesh-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#cylinder1-mesh-map-0" offset="2" set="0"/>
@@ -1421,6 +1515,22 @@
   </library_geometries>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
+      <node id="Plane" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_geometry url="#Plane-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Material1" target="#Material-material">
+                <bind_vertex_input semantic="UVTex" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
       <node id="Point" type="NODE">
         <translate sid="location">10.56016 -10.68292 -2.063</translate>
         <rotate sid="rotationZ">0 0 1 0</rotate>
@@ -1438,12 +1548,20 @@
         <instance_geometry url="#cylinder1-mesh">
           <bind_material>
             <technique_common>
-              <instance_material symbol="default1" target="#default-material">
+              <instance_material symbol="glass1" target="#glass-material">
                 <bind_vertex_input semantic="UVTex" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>
             </technique_common>
           </bind_material>
         </instance_geometry>
+      </node>
+      <node id="Camera" type="NODE">
+        <translate sid="location">8.492184 47.58103 19.36245</translate>
+        <rotate sid="rotationZ">0 0 1 -2.350455</rotate>
+        <rotate sid="rotationY">0 1 0 10.5146</rotate>
+        <rotate sid="rotationX">1 0 0 87.96758</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_camera url="#Camera-camera"/>
       </node>
       <node id="Icosphere_001" type="NODE">
         <translate sid="location">1.209336 -1.500861 4.296074</translate>
@@ -1716,14 +1834,6 @@
         <rotate sid="rotationX">1 0 0 0</rotate>
         <scale sid="scale">1 1 1</scale>
         <instance_geometry url="#Cube-mesh"/>
-      </node>
-      <node id="Camera" type="NODE">
-        <translate sid="location">-0.1163428 -12.86293 2.386373</translate>
-        <rotate sid="rotationZ">0 0 1 -2.350455</rotate>
-        <rotate sid="rotationY">0 1 0 10.5146</rotate>
-        <rotate sid="rotationX">1 0 0 87.96758</rotate>
-        <scale sid="scale">1 1 1</scale>
-        <instance_camera url="#Camera-camera"/>
       </node>
       <node id="Lamp" type="NODE">
         <translate sid="location">4.076245 1.005454 5.903862</translate>

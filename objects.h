@@ -42,4 +42,6 @@ extern object_info br8_obj;
 
 extern object_info glass_obj;
 
+extern object_info table_obj;
+
 #endif

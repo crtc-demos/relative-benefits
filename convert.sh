@@ -37,3 +37,5 @@ objconvert -yz -gl -n br7 -d -s Cube_029-mesh -o br7.inc teeth.dae
 objconvert -yz -gl -n br8 -d -s Cube_030-mesh -o br8.inc teeth.dae
 
 objconvert -yz -gl -n glass -d -s cylinder1-mesh -o cylinder.inc teeth.dae
+
+objconvert -uv -yz -gl -n table -d -s Plane-mesh -o table.inc teeth.dae

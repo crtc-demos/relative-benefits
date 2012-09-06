@@ -29,11 +29,11 @@
 #include "chompy.h"
 #include "sundown.h"
 
-#undef SKIP_TO_TIME
-//#define SKIP_TO_TIME 36000
+//#undef SKIP_TO_TIME
+#define SKIP_TO_TIME 10000
 
 #ifdef SKIP_TO_TIME
-u64 offset_time = 0;
+uint64_t offset_time = 0;
 #else
 #define offset_time 0
 #endif
@@ -226,7 +226,7 @@ main (int argc, char *argv[])
   offset_time = SKIP_TO_TIME;
 #endif
   
-  omxaudio_play ();
+  omxaudio_play (offset_time);
 
   while (!quit)
     {

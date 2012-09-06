@@ -406,7 +406,7 @@ player_thread (void *arg)
 }
 
 void
-omxaudio_play (void)
+omxaudio_play (uint32_t skip_to_millis)
 {
   pthread_t thread;
   int rc;
@@ -415,7 +415,7 @@ omxaudio_play (void)
   ret = audioplay_set_dest (st, "local");
   assert (ret == 0);
   
-  adpcm_play (player_handle, 0);
+  adpcm_play (player_handle, skip_to_millis);
 
   rc = pthread_create (&thread, NULL, player_thread, NULL);
 }

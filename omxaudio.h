@@ -4,6 +4,6 @@
 extern void omxaudio_init (void);
 extern int omxaudio_load (const char *filename);
 extern void omxaudio_deinit (void);
-extern void omxaudio_play (void);
+extern void omxaudio_play (uint32_t);
 
 #endif

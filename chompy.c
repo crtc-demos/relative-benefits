@@ -8,7 +8,21 @@
 #include "shader.h"
 #include "transform.h"
 
-void draw_object (object_info *obj)
+chompy_info chompy_info_0;
+
+void
+preinit_chompy (void)
+{
+  int width, height, alpha;
+  char *imgdata;
+  
+  imgdata = readpng_image ("wood.png", &width, &height, &alpha);
+  chompy_info_0.texture = readpng_bindgl2d (imgdata, width, height, alpha);
+  free (imgdata);
+}
+
+void
+draw_object (object_info *obj)
 {
  // glUseProgram (obj->shader_program);
 
@@ -24,6 +38,13 @@ void draw_object (object_info *obj)
       glVertexAttribPointer (obj->attr.norm, 3, GL_FLOAT, GL_FALSE,
 			     obj->vertex_size, obj->data.norm);
       glEnableVertexAttribArray (obj->attr.norm);
+    }
+
+  if ((obj->attrs & ATTR_MASK_TEXCOORD) != 0)
+    {
+      glVertexAttribPointer (obj->attr.texcoord, 2, GL_FLOAT, GL_FALSE,
+			     obj->vertex_size, obj->data.texcoord);
+      glEnableVertexAttribArray (obj->attr.texcoord);
     }
 
   glDrawArrays (GL_TRIANGLE_STRIP, 0, obj->striplength);
@@ -108,7 +129,21 @@ init_chompy (void *params, display_info *disp)
 
   u_lightpos = get_uniform_location (shaderProgram, "u_lightpos");
   printf ("u_lightpos uniform number: %d\n", u_lightpos);
+  
+  chompy_info_0.wood_shader = create_program_with_shaders ("wood.vtx",
+    "wood.frag");
 
+  glBindAttribLocation (chompy_info_0.wood_shader, table_obj.attr.pos,
+			"a_position");
+  glBindAttribLocation (chompy_info_0.wood_shader, table_obj.attr.texcoord,
+			"a_texcoord");
+
+  link_and_check (chompy_info_0.wood_shader);
+  
+  chompy_info_0.u_mvp = get_uniform_location (chompy_info_0.wood_shader,
+					      "u_mvp");
+  chompy_info_0.s_texture = get_uniform_location (chompy_info_0.wood_shader,
+						  "s_texture");
 }
 
 void
@@ -178,19 +213,33 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
 
   render_object (1);
 
-  transform_identity4 (model);
+  /*transform_identity4 (model);
 
   transform_mul4 (modelview, view, model);
   transform_invert4 (inv_modelview, modelview);
   transform_point4 (&light0_t, inv_modelview, &light0);
   transform_mul4 (mvp, perspective, modelview);
-  glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);
+  glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);*/
+  
+  glUseProgram (chompy_info_0.wood_shader);
+  
+  transform_rotate4_mat (model, 0, 1, 0, angle);
+  transform_mul4 (modelview, view, model);
+  transform_mul4 (mvp, perspective, modelview);
+  glUniformMatrix4fv (chompy_info_0.u_mvp, 1, GL_FALSE, mvp);
+  
+  glActiveTexture (GL_TEXTURE0);
+  glBindTexture (GL_TEXTURE_2D, chompy_info_0.texture);
+  glUniform1i (chompy_info_0.s_texture, 0);
+  
+  draw_object (&table_obj);
+  
   angle += 0.02;
 }
 
 effect_methods chompy_methods =
 {
-  .preinit_assets = NULL,
+  .preinit_assets = &preinit_chompy,
   .init_effect = &init_chompy,
   .prepare_frame = NULL,
   .display_effect = &display_chompy,
