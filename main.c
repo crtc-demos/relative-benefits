@@ -241,8 +241,8 @@ main (int argc, char *argv[])
 		       * (171 / 60.0) / 4.0;
 	sync.bar = sync.bar_pos;
 	sync.bar_pos = sync.bar_pos - floorf (sync.bar_pos);
-	if (last_bar != sync.bar)
-	  printf ("bar %d\n", sync.bar);
+	/*if (last_bar != sync.bar)
+	  printf ("bar %d\n", sync.bar);*/
 	last_bar = sync.bar;
       }
 

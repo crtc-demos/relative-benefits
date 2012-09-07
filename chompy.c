@@ -168,11 +168,11 @@ init_chompy (void *params, display_info *disp)
 
   chompy_info_0.tooth.u_mvp
     = get_uniform_location (chompy_info_0.tooth.shader, "u_mvp");
-  printf ("u_mvp uniform number: %d\n", chompy_info_0.tooth.u_mvp);
+  //printf ("u_mvp uniform number: %d\n", chompy_info_0.tooth.u_mvp);
 
   chompy_info_0.tooth.u_lightpos
     = get_uniform_location (chompy_info_0.tooth.shader, "u_lightpos");
-  printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
+  //printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
   chompy_info_0.tooth.u_toothcolour
     = get_uniform_location (chompy_info_0.tooth.shader, "u_toothcolour");
   
@@ -189,11 +189,11 @@ init_chompy (void *params, display_info *disp)
 
   chompy_info_0.gum.u_mvp
     = get_uniform_location (chompy_info_0.gum.shader, "u_mvp");
-  printf ("u_mvp uniform number: %d\n", chompy_info_0.gum.u_mvp);
+  //printf ("u_mvp uniform number: %d\n", chompy_info_0.gum.u_mvp);
 
   chompy_info_0.tooth.u_lightpos
     = get_uniform_location (chompy_info_0.tooth.shader, "u_lightpos");
-  printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
+  //printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
 
   /* Set up wood shader.  */
   chompy_info_0.wood.shader = create_program_with_shaders ("wood.vtx",
