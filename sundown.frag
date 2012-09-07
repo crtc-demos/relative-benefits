@@ -4,7 +4,7 @@ uniform float u_time;
 
 float dist (float x, float y, float i, float j)
 {
-  x = x - i;
+  x = (4.0 / 3.0) * (x - i);
   y = y - j;
   return sqrt (x * x + y * y);
 }
@@ -17,7 +17,7 @@ vec4 sun1 (void)
   vec4 nightsky = mix (vec4 (0.0, 0.0, 0.0, 1.0), vec4 (0.8, 0.35, 0.0, 1.0),
 		       ycoord);
   vec4 sky = mix (daysky, nightsky, u_time / 11.0);
-  float g = smoothstep (0.05, 0.06,
+  float g = smoothstep (0.06, 0.08,
 			dist (v_texcoord[0], v_texcoord[1], 0.5,
 			      u_time / 20.0));
   return mix (vec4 (1.0, 1.0, 0.0, 1.0), sky, g);
