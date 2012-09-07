@@ -52,79 +52,97 @@ draw_object (object_info *obj)
 }
 
 void
-render_object (int top)
+top_teeth (void)
 {
-  /* Top gum.  */
-
-  if (top)
-    {
-      draw_object (&topgum_obj);
-      draw_object (&tl1_obj);
-      draw_object (&tl1_obj);
-      draw_object (&tl2_obj);
-      draw_object (&tl3_obj);
-      draw_object (&tl4_obj);
-      draw_object (&tl5_obj);
-      draw_object (&tl6_obj);
-      draw_object (&tl7_obj);
-      draw_object (&tr1_obj);
-      draw_object (&tr2_obj);
-      draw_object (&tr3_obj);
-      draw_object (&tr4_obj);
-      draw_object (&tr5_obj);
-      draw_object (&tr6_obj);
-      draw_object (&tr7_obj);
-    }
-  else
-    {
-      /* Bottom gum.  */
-      draw_object (&bottomgum_obj);
-      draw_object (&bl1_obj);
-      draw_object (&bl1_obj);
-      draw_object (&bl2_obj);
-      draw_object (&bl3_obj);
-      draw_object (&bl4_obj);
-      draw_object (&bl5_obj);
-      draw_object (&bl6_obj);
-      draw_object (&bl7_obj);
-      draw_object (&bl8_obj);
-      draw_object (&br1_obj);
-      draw_object (&br2_obj);
-      draw_object (&br3_obj);
-      draw_object (&br4_obj);
-      draw_object (&br5_obj);
-      draw_object (&br6_obj);
-      draw_object (&br7_obj);
-      draw_object (&br8_obj);
-    }
+  //draw_object (&topgum_obj);
+  draw_object (&tl1_obj);
+  draw_object (&tl1_obj);
+  draw_object (&tl2_obj);
+  draw_object (&tl3_obj);
+  draw_object (&tl4_obj);
+  draw_object (&tl5_obj);
+  draw_object (&tl6_obj);
+  draw_object (&tl7_obj);
+  draw_object (&tr1_obj);
+  draw_object (&tr2_obj);
+  draw_object (&tr3_obj);
+  draw_object (&tr4_obj);
+  draw_object (&tr5_obj);
+  draw_object (&tr6_obj);
+  draw_object (&tr7_obj);
 }
+
+void
+bottom_teeth (void)
+{
+//draw_object (&bottomgum_obj);
+  draw_object (&bl1_obj);
+  draw_object (&bl1_obj);
+  draw_object (&bl2_obj);
+  draw_object (&bl3_obj);
+  draw_object (&bl4_obj);
+  draw_object (&bl5_obj);
+  draw_object (&bl6_obj);
+  draw_object (&bl7_obj);
+  draw_object (&bl8_obj);
+  draw_object (&br1_obj);
+  draw_object (&br2_obj);
+  draw_object (&br3_obj);
+  draw_object (&br4_obj);
+  draw_object (&br5_obj);
+  draw_object (&br6_obj);
+  draw_object (&br7_obj);
+  draw_object (&br8_obj);
+}
+
 
 float angle = 0;
 float angle2 = 0;
 
 static GLfloat perspective[16];
 static GLfloat mvp[16];
-static GLint u_mvp;
-static GLint u_lightpos;
-
-static GLuint shaderProgram;
 
 void
 init_chompy (void *params, display_info *disp)
 {
-  shaderProgram = create_program_with_shaders ("teeth.vtx", "teeth.frag");
+  /* Teeth.  */
+  chompy_info_0.tooth.shader = create_program_with_shaders ("teeth.vtx",
+    "teeth.frag");
 
-  glBindAttribLocation (shaderProgram, topgum_obj.attr.pos, "a_position");
-  glBindAttribLocation (shaderProgram, topgum_obj.attr.norm, "a_normal");
+  glBindAttribLocation (chompy_info_0.tooth.shader, tl1_obj.attr.pos,
+			"a_position");
+  glBindAttribLocation (chompy_info_0.tooth.shader, tl1_obj.attr.norm,
+			"a_normal");
 
-  link_and_check (shaderProgram);
+  link_and_check (chompy_info_0.tooth.shader);
 
-  u_mvp = get_uniform_location (shaderProgram, "u_mvp");
-  printf ("u_mvp uniform number: %d\n", u_mvp);
+  chompy_info_0.tooth.u_mvp
+    = get_uniform_location (chompy_info_0.tooth.shader, "u_mvp");
+  printf ("u_mvp uniform number: %d\n", chompy_info_0.tooth.u_mvp);
 
-  u_lightpos = get_uniform_location (shaderProgram, "u_lightpos");
-  printf ("u_lightpos uniform number: %d\n", u_lightpos);
+  chompy_info_0.tooth.u_lightpos
+    = get_uniform_location (chompy_info_0.tooth.shader, "u_lightpos");
+  printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
   
+  /* Gum.  */
+  chompy_info_0.gum.shader = create_program_with_shaders ("gum.vtx",
+    "gum.frag");
+
+  glBindAttribLocation (chompy_info_0.gum.shader, topgum_obj.attr.pos,
+			"a_position");
+  glBindAttribLocation (chompy_info_0.gum.shader, topgum_obj.attr.norm,
+			"a_normal");
+
+  link_and_check (chompy_info_0.gum.shader);
+
+  chompy_info_0.gum.u_mvp
+    = get_uniform_location (chompy_info_0.gum.shader, "u_mvp");
+  printf ("u_mvp uniform number: %d\n", chompy_info_0.gum.u_mvp);
+
+  chompy_info_0.tooth.u_lightpos
+    = get_uniform_location (chompy_info_0.tooth.shader, "u_lightpos");
+  printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
+
   /* Set up wood shader.  */
   chompy_info_0.wood.shader = create_program_with_shaders ("wood.vtx",
     "wood.frag");
@@ -180,9 +198,10 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
 			  1.0, 200.0);
 
   glViewport (0, 0, disp->width, disp->height);
-  glUseProgram (shaderProgram);
+  glUseProgram (chompy_info_0.gum.shader);
 
-  glUniform3f (u_lightpos, light0_t.x, light0_t.y, light0_t.z);
+  glUniform3f (chompy_info_0.gum.u_lightpos, light0_t.x, light0_t.y,
+	       light0_t.z);
 
   transform_identity4 (model);
   transform_identity4 (ident);
@@ -203,9 +222,22 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   transform_invert4 (inv_modelview, modelview);
   transform_point4 (&light0_t, inv_modelview, &light0);
   transform_mul4 (mvp, perspective, modelview);
-  glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);
+  glUniformMatrix4fv (chompy_info_0.gum.u_mvp, 1, GL_FALSE, mvp);
 
-  render_object (0);
+  draw_object (&bottomgum_obj);
+
+  glUseProgram (chompy_info_0.tooth.shader);
+
+  glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
+	       light0_t.z);
+  glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
+
+  bottom_teeth ();
+
+  glUseProgram (chompy_info_0.gum.shader);
+
+  glUniform3f (chompy_info_0.gum.u_lightpos, light0_t.x, light0_t.y,
+	       light0_t.z);
 
   transform_translate4_mat (xlate, 0, 0, 3.5);
   transform_rotate4_mat (chomp, 1, 0, 0, -angle2 / 3);
@@ -221,9 +253,17 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   transform_invert4 (inv_modelview, modelview);
   transform_point4 (&light0_t, inv_modelview, &light0);
   transform_mul4 (mvp, perspective, modelview);
-  glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);
+  glUniformMatrix4fv (chompy_info_0.gum.u_mvp, 1, GL_FALSE, mvp);
 
-  render_object (1);
+  draw_object (&topgum_obj);
+  
+  glUseProgram (chompy_info_0.tooth.shader);
+
+  glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
+	       light0_t.z);
+  glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
+
+  top_teeth ();
 
   /*transform_identity4 (model);
 
