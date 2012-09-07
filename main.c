@@ -30,7 +30,7 @@
 #include "sundown.h"
 
 #undef SKIP_TO_TIME
-//#define SKIP_TO_TIME 20000
+//#define SKIP_TO_TIME 40000
 
 #ifdef SKIP_TO_TIME
 uint64_t offset_time = 0;

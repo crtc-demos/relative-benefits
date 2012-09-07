@@ -9,6 +9,8 @@
 #include "shader.h"
 #include "transform.h"
 #include "readpng.h"
+#include "sundown.h"
+
 
 chompy_info chompy_info_0;
 
@@ -20,6 +22,11 @@ preinit_chompy (void)
   
   imgdata = readpng_image ("wood.png", &width, &height, &alpha);
   chompy_info_0.texture = readpng_bindgl2d (imgdata, width, height, alpha);
+  free (imgdata);
+  
+  imgdata = readpng_image ("greets.png", &width, &height, &alpha);
+  chompy_info_0.greet.texture = readpng_bindgl2d (imgdata, width, height,
+						  alpha);
   free (imgdata);
 }
 
@@ -131,6 +138,8 @@ bottom_teeth (void)
   draw_object (&br8_obj);
 }
 
+#define GREET_ATTR_POS 0
+#define GREET_ATTR_TEX 1
 
 static GLfloat perspective[16];
 static GLfloat mvp[16];
@@ -206,6 +215,9 @@ init_chompy (void *params, display_info *disp)
   glBindTexture (GL_TEXTURE_2D, chompy_info_0.texture);
   glGenerateMipmap (GL_TEXTURE_2D);
 
+  glActiveTexture (GL_TEXTURE1);
+  glBindTexture (GL_TEXTURE_2D, chompy_info_0.greet.texture);
+
   /* Set up glass shader.  */
   chompy_info_0.glass.shader = create_program_with_shaders ("glass.vtx",
     "glass.frag");
@@ -218,6 +230,19 @@ init_chompy (void *params, display_info *disp)
   chompy_info_0.glass.u_mvp = get_uniform_location (chompy_info_0.glass.shader,
  						    "u_mvp");
   chompy_info_0.drop = 20.0;
+  
+  /* Set up greetings shader.  */
+  chompy_info_0.greet.shader = create_program_with_shaders ("sundown.vtx",
+    "greet.frag");
+  glBindAttribLocation (chompy_info_0.greet.shader, GREET_ATTR_POS,
+			"a_position");
+  glBindAttribLocation (chompy_info_0.greet.shader, GREET_ATTR_TEX,
+			"a_texcoord");
+  link_and_check (chompy_info_0.greet.shader);
+  chompy_info_0.greet.u_mvp = get_uniform_location (chompy_info_0.greet.shader,
+						    "u_mvp");
+  chompy_info_0.greet.s_texture
+    = get_uniform_location (chompy_info_0.greet.shader, "s_texture");
 }
 
 void
@@ -376,11 +401,17 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   glCullFace (GL_BACK);
   draw_object (&glass_obj);
   
+  if (sync->bar >= 32)
+    {
+      glUseProgram (chompy_info_0.greet.shader);
+      glUniform1i (chompy_info_0.greet.s_texture, 1);
+      glBlendFunc (GL_ONE, GL_ONE);
+      render_screen_quad (disp, chompy_info_0.greet.u_mvp);
+    }
+  
   glDisable (GL_BLEND);
   glEnable (GL_CULL_FACE);
   glDepthMask (GL_TRUE);
-  
-  angle += 0.02;
 }
 
 effect_methods chompy_methods =

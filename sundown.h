@@ -17,4 +17,6 @@ typedef struct {
 extern effect_methods sundown_methods;
 extern sundown_info sundown_info_0;
 
+extern void render_screen_quad (display_info *disp, GLint mvp_uniform);
+
 #endif
