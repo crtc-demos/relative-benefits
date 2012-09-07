@@ -1,0 +1,10 @@
+uniform mat4 u_mvp;
+attribute vec3 a_position;
+attribute vec3 a_normal;
+varying vec3 v_normal;
+
+void main ()
+{
+  v_normal = a_normal;
+  gl_Position = u_mvp * vec4 (a_position.x, a_position.y, a_position.z, 1.0);
+}

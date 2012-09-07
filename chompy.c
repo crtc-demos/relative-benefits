@@ -7,6 +7,7 @@
 #include "chompy.h"
 #include "shader.h"
 #include "transform.h"
+#include "readpng.h"
 
 chompy_info chompy_info_0;
 
@@ -98,12 +99,6 @@ render_object (int top)
     }
 }
 
-void
-glass (void)
-{
-  draw_object (&glass_obj);
-}
-
 float angle = 0;
 float angle2 = 0;
 
@@ -130,20 +125,37 @@ init_chompy (void *params, display_info *disp)
   u_lightpos = get_uniform_location (shaderProgram, "u_lightpos");
   printf ("u_lightpos uniform number: %d\n", u_lightpos);
   
-  chompy_info_0.wood_shader = create_program_with_shaders ("wood.vtx",
+  /* Set up wood shader.  */
+  chompy_info_0.wood.shader = create_program_with_shaders ("wood.vtx",
     "wood.frag");
 
-  glBindAttribLocation (chompy_info_0.wood_shader, table_obj.attr.pos,
+  glBindAttribLocation (chompy_info_0.wood.shader, table_obj.attr.pos,
 			"a_position");
-  glBindAttribLocation (chompy_info_0.wood_shader, table_obj.attr.texcoord,
+  glBindAttribLocation (chompy_info_0.wood.shader, table_obj.attr.texcoord,
 			"a_texcoord");
 
-  link_and_check (chompy_info_0.wood_shader);
+  link_and_check (chompy_info_0.wood.shader);
   
-  chompy_info_0.u_mvp = get_uniform_location (chompy_info_0.wood_shader,
-					      "u_mvp");
-  chompy_info_0.s_texture = get_uniform_location (chompy_info_0.wood_shader,
-						  "s_texture");
+  chompy_info_0.wood.u_mvp = get_uniform_location (chompy_info_0.wood.shader,
+						   "u_mvp");
+  chompy_info_0.wood.s_texture
+    = get_uniform_location (chompy_info_0.wood.shader, "s_texture");
+
+  glActiveTexture (GL_TEXTURE0);
+  glBindTexture (GL_TEXTURE_2D, chompy_info_0.texture);
+  glGenerateMipmap (GL_TEXTURE_2D);
+
+  /* Set up glass shader.  */
+  chompy_info_0.glass.shader = create_program_with_shaders ("glass.vtx",
+    "glass.frag");
+  glBindAttribLocation (chompy_info_0.glass.shader, glass_obj.attr.pos,
+			"a_position");
+  glBindAttribLocation (chompy_info_0.glass.shader, glass_obj.attr.norm,
+			"a_normal");
+  link_and_check (chompy_info_0.glass.shader);
+
+  chompy_info_0.glass.u_mvp = get_uniform_location (chompy_info_0.glass.shader,
+ 						    "u_mvp");
 }
 
 void
@@ -221,18 +233,34 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   transform_mul4 (mvp, perspective, modelview);
   glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);*/
   
-  glUseProgram (chompy_info_0.wood_shader);
+  glUseProgram (chompy_info_0.wood.shader);
   
   transform_rotate4_mat (model, 0, 1, 0, angle);
   transform_mul4 (modelview, view, model);
   transform_mul4 (mvp, perspective, modelview);
-  glUniformMatrix4fv (chompy_info_0.u_mvp, 1, GL_FALSE, mvp);
+  glUniformMatrix4fv (chompy_info_0.wood.u_mvp, 1, GL_FALSE, mvp);
   
-  glActiveTexture (GL_TEXTURE0);
-  glBindTexture (GL_TEXTURE_2D, chompy_info_0.texture);
-  glUniform1i (chompy_info_0.s_texture, 0);
+  glUniform1i (chompy_info_0.wood.s_texture, 0);
   
   draw_object (&table_obj);
+  
+  glUseProgram (chompy_info_0.glass.shader);
+
+  glUniformMatrix4fv (chompy_info_0.glass.u_mvp, 1, GL_FALSE, mvp);
+  
+  glEnable (GL_BLEND);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //glBlendFunc (GL_ONE, GL_ONE);
+  //glDepthMask (GL_FALSE);
+  
+  glCullFace (GL_FRONT);
+  draw_object (&glass_obj);
+  glCullFace (GL_BACK);
+  draw_object (&glass_obj);
+  
+  glDisable (GL_BLEND);
+  glEnable (GL_CULL_FACE);
+  glDepthMask (GL_TRUE);
   
   angle += 0.02;
 }

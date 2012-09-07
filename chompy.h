@@ -5,9 +5,15 @@
 
 typedef struct {
   GLint texture;
-  GLuint wood_shader;
-  GLint s_texture;
-  GLint u_mvp;
+  struct {
+    GLuint shader;
+    GLint s_texture;
+    GLint u_mvp;
+  } wood;
+  struct {
+    GLuint shader;
+    GLint u_mvp;
+  } glass;
 } chompy_info;
 
 extern chompy_info chompy_info_0;

@@ -29,8 +29,8 @@
 #include "chompy.h"
 #include "sundown.h"
 
-//#undef SKIP_TO_TIME
-#define SKIP_TO_TIME 10000
+#undef SKIP_TO_TIME
+//#define SKIP_TO_TIME 10000
 
 #ifdef SKIP_TO_TIME
 uint64_t offset_time = 0;
