@@ -217,6 +217,7 @@ init_chompy (void *params, display_info *disp)
 
   chompy_info_0.glass.u_mvp = get_uniform_location (chompy_info_0.glass.shader,
  						    "u_mvp");
+  chompy_info_0.drop = 20.0;
 }
 
 void
@@ -237,22 +238,25 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   float angle = (float) sync->time_offset / 1000.0;
   float angle2 = 0.5 + 0.5 * cosf (sync->bar_pos * 2 * M_PI);
 
-  for (i = 0; i < 30; i++)
-    {
-      chompy_info_0.teeth[i].r *= 0.90;
-      chompy_info_0.teeth[i].g *= 0.90;
-      chompy_info_0.teeth[i].b *= 0.90;
-    }
-
-  if (last_beat != beat)
+  if (sync->bar >= 24)
     {
       for (i = 0; i < 30; i++)
-        {
-	  chompy_info_0.teeth[i].r = drand48 ();
-	  chompy_info_0.teeth[i].g = drand48 ();
-	  chompy_info_0.teeth[i].b = drand48 ();
+	{
+	  chompy_info_0.teeth[i].r *= 0.90;
+	  chompy_info_0.teeth[i].g *= 0.90;
+	  chompy_info_0.teeth[i].b *= 0.90;
 	}
-      last_beat = beat;
+
+      if (last_beat != beat && sync->bar <= 30)
+	{
+	  for (i = 0; i < 30; i++)
+            {
+	      chompy_info_0.teeth[i].r = drand48 ();
+	      chompy_info_0.teeth[i].g = drand48 ();
+	      chompy_info_0.teeth[i].b = drand48 ();
+	    }
+	  last_beat = beat;
+	}
     }
 
   transform_lookat4 (view, &(ttd_point3d) { 0, 0, 15 },
@@ -266,68 +270,78 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   glViewport (0, 0, disp->width, disp->height);
   glUseProgram (chompy_info_0.gum.shader);
 
-  glUniform3f (chompy_info_0.gum.u_lightpos, light0_t.x, light0_t.y,
-	       light0_t.z);
+  if (sync->bar >= 15)
+    {
+      glUniform3f (chompy_info_0.gum.u_lightpos, light0_t.x, light0_t.y,
+		   light0_t.z);
 
-  transform_identity4 (model);
-  transform_identity4 (ident);
+      transform_identity4 (model);
+      transform_identity4 (ident);
 
-  transform_translate4_mat (xlate, 0, 0, 3.5);
-  transform_rotate4_mat (chomp, 1, 0, 0, angle2 / 2);
+      transform_translate4_mat (xlate, 0, 0, 3.5);
+      transform_rotate4_mat (chomp, 1, 0, 0, angle2 / 2);
 
-  transform_mul4 (model, chomp, xlate);
-  transform_translate4_mat (xlate, 0, 0, -3.5);
-  transform_mul4 (model, xlate, model);
+      transform_mul4 (model, chomp, xlate);
+      transform_translate4_mat (xlate, 0, chompy_info_0.drop, -3.5);
+      transform_mul4 (model, xlate, model);
 
-  transform_rotate4_mat (xlate, 0, 1, 0, angle);
-  transform_mul4 (model, xlate, model);
+      transform_rotate4_mat (xlate, 0, 1, 0, angle);
+      transform_mul4 (model, xlate, model);
 
-  transform_mul4 (modelview, view, model);
-  transform_invert4 (inv_modelview, modelview);
-  transform_point4 (&light0_t, inv_modelview, &light0);
-  transform_mul4 (mvp, perspective, modelview);
-  glUniformMatrix4fv (chompy_info_0.gum.u_mvp, 1, GL_FALSE, mvp);
+      transform_mul4 (modelview, view, model);
+      transform_invert4 (inv_modelview, modelview);
+      transform_point4 (&light0_t, inv_modelview, &light0);
+      transform_mul4 (mvp, perspective, modelview);
+      glUniformMatrix4fv (chompy_info_0.gum.u_mvp, 1, GL_FALSE, mvp);
 
-  draw_object (&bottomgum_obj);
+      draw_object (&bottomgum_obj);
 
-  glUseProgram (chompy_info_0.tooth.shader);
+      glUseProgram (chompy_info_0.tooth.shader);
 
-  glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
-	       light0_t.z);
-  glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
+      glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
+		   light0_t.z);
+      glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
 
-  bottom_teeth ();
+      bottom_teeth ();
 
-  glUseProgram (chompy_info_0.gum.shader);
+      glUseProgram (chompy_info_0.gum.shader);
 
-  glUniform3f (chompy_info_0.gum.u_lightpos, light0_t.x, light0_t.y,
-	       light0_t.z);
+      glUniform3f (chompy_info_0.gum.u_lightpos, light0_t.x, light0_t.y,
+		   light0_t.z);
 
-  transform_translate4_mat (xlate, 0, 0, 3.5);
-  transform_rotate4_mat (chomp, 1, 0, 0, -angle2 / 3);
+      transform_translate4_mat (xlate, 0, 0, 3.5);
+      transform_rotate4_mat (chomp, 1, 0, 0, -angle2 / 3);
 
-  transform_mul4 (model, chomp, xlate);
-  transform_translate4_mat (xlate, 0, 0, -3.5);
-  transform_mul4 (model, xlate, model);
+      transform_mul4 (model, chomp, xlate);
+      transform_translate4_mat (xlate, 0, chompy_info_0.drop, -3.5);
+      transform_mul4 (model, xlate, model);
 
-  transform_rotate4_mat (xlate, 0, 1, 0, angle);
-  transform_mul4 (model, xlate, model);
+      if (chompy_info_0.drop <= 0.5)
+        chompy_info_0.drop = 0.0;
+      else if (chompy_info_0.drop > 0)
+        chompy_info_0.drop -= 0.5;
 
-  transform_mul4 (modelview, view, model);
-  transform_invert4 (inv_modelview, modelview);
-  transform_point4 (&light0_t, inv_modelview, &light0);
-  transform_mul4 (mvp, perspective, modelview);
-  glUniformMatrix4fv (chompy_info_0.gum.u_mvp, 1, GL_FALSE, mvp);
+   //   printf ("%f\n", chompy_info_0.drop);
 
-  draw_object (&topgum_obj);
-  
-  glUseProgram (chompy_info_0.tooth.shader);
+      transform_rotate4_mat (xlate, 0, 1, 0, angle);
+      transform_mul4 (model, xlate, model);
 
-  glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
-	       light0_t.z);
-  glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
+      transform_mul4 (modelview, view, model);
+      transform_invert4 (inv_modelview, modelview);
+      transform_point4 (&light0_t, inv_modelview, &light0);
+      transform_mul4 (mvp, perspective, modelview);
+      glUniformMatrix4fv (chompy_info_0.gum.u_mvp, 1, GL_FALSE, mvp);
 
-  top_teeth ();
+      draw_object (&topgum_obj);
+
+      glUseProgram (chompy_info_0.tooth.shader);
+
+      glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
+		   light0_t.z);
+      glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
+
+      top_teeth ();
+    }
 
   /*transform_identity4 (model);
 

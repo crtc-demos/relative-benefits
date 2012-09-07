@@ -28,6 +28,7 @@ typedef struct {
     GLuint shader;
     GLint u_mvp;
   } glass;
+  float drop;
 } chompy_info;
 
 extern chompy_info chompy_info_0;

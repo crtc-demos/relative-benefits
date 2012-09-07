@@ -51,8 +51,9 @@ effect_methods null_effect =
 };
 
 static do_thing_at sequence[] = {
-  {      0,  20000, &sundown_methods, NULL, -1, 0 },
-  {  20000,  60000, &chompy_methods, NULL, -1, 0 }
+  {      0,  11000, &sundown_methods, NULL, -1, 0 },
+  {  11000,  60000, &chompy_methods, NULL, -1, 0 },
+  {  60000,  62000, &null_effect, NULL, -1, 0 }
 };
 
 #define MAX_ACTIVE 20
