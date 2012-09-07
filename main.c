@@ -30,7 +30,7 @@
 #include "sundown.h"
 
 #undef SKIP_TO_TIME
-//#define SKIP_TO_TIME 10000
+//#define SKIP_TO_TIME 20000
 
 #ifdef SKIP_TO_TIME
 uint64_t offset_time = 0;
@@ -51,8 +51,8 @@ effect_methods null_effect =
 };
 
 static do_thing_at sequence[] = {
-  {      0,  10000, &sundown_methods, NULL, -1, 0 },
-  {  10000,  60000, &chompy_methods, NULL, -1, 0 }
+  {      0,  20000, &sundown_methods, NULL, -1, 0 },
+  {  20000,  60000, &chompy_methods, NULL, -1, 0 }
 };
 
 #define MAX_ACTIVE 20
@@ -237,7 +237,7 @@ main (int argc, char *argv[])
 
       {
 	sync.bar_pos = ((float) current_time / 1000.0)
-		       * (170.0 / 60.0) / 4.0;
+		       * (171 / 60.0) / 4.0;
 	sync.bar = sync.bar_pos;
 	sync.bar_pos = sync.bar_pos - floorf (sync.bar_pos);
 	if (last_bar != sync.bar)

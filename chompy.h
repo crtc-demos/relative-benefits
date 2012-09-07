@@ -9,7 +9,11 @@ typedef struct {
     GLuint shader;
     GLint u_mvp;
     GLint u_lightpos;
+    GLint u_toothcolour;
   } tooth;
+  struct {
+    float r, g, b;
+  } teeth[30];
   struct {
     GLuint shader;
     GLint u_mvp;

@@ -2,6 +2,7 @@
 #include <EGL/egl.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "objects.h"
 #include "chompy.h"
@@ -52,23 +53,43 @@ draw_object (object_info *obj)
 }
 
 void
+tooth_colour (int i)
+{
+  glUniform4f (chompy_info_0.tooth.u_toothcolour, chompy_info_0.teeth[i].r,
+    chompy_info_0.teeth[i].g, chompy_info_0.teeth[i].b, 0);
+}
+
+void
 top_teeth (void)
 {
   //draw_object (&topgum_obj);
+  tooth_colour (0);
   draw_object (&tl1_obj);
-  draw_object (&tl1_obj);
+  tooth_colour (1);
   draw_object (&tl2_obj);
+  tooth_colour (2);
   draw_object (&tl3_obj);
+  tooth_colour (3);
   draw_object (&tl4_obj);
+  tooth_colour (4);
   draw_object (&tl5_obj);
+  tooth_colour (5);
   draw_object (&tl6_obj);
+  tooth_colour (6);
   draw_object (&tl7_obj);
+  tooth_colour (7);
   draw_object (&tr1_obj);
+  tooth_colour (8);
   draw_object (&tr2_obj);
+  tooth_colour (9);
   draw_object (&tr3_obj);
+  tooth_colour (10);
   draw_object (&tr4_obj);
+  tooth_colour (11);
   draw_object (&tr5_obj);
+  tooth_colour (12);
   draw_object (&tr6_obj);
+  tooth_colour (13);
   draw_object (&tr7_obj);
 }
 
@@ -76,28 +97,40 @@ void
 bottom_teeth (void)
 {
 //draw_object (&bottomgum_obj);
+  tooth_colour (14);
   draw_object (&bl1_obj);
-  draw_object (&bl1_obj);
+  tooth_colour (15);
   draw_object (&bl2_obj);
+  tooth_colour (16);
   draw_object (&bl3_obj);
+  tooth_colour (17);
   draw_object (&bl4_obj);
+  tooth_colour (18);
   draw_object (&bl5_obj);
+  tooth_colour (19);
   draw_object (&bl6_obj);
+  tooth_colour (20);
   draw_object (&bl7_obj);
+  tooth_colour (21);
   draw_object (&bl8_obj);
+  tooth_colour (22);
   draw_object (&br1_obj);
+  tooth_colour (23);
   draw_object (&br2_obj);
+  tooth_colour (24);
   draw_object (&br3_obj);
+  tooth_colour (25);
   draw_object (&br4_obj);
+  tooth_colour (26);
   draw_object (&br5_obj);
+  tooth_colour (27);
   draw_object (&br6_obj);
+  tooth_colour (28);
   draw_object (&br7_obj);
+  tooth_colour (29);
   draw_object (&br8_obj);
 }
 
-
-float angle = 0;
-float angle2 = 0;
 
 static GLfloat perspective[16];
 static GLfloat mvp[16];
@@ -105,6 +138,14 @@ static GLfloat mvp[16];
 void
 init_chompy (void *params, display_info *disp)
 {
+  int i;
+  
+  for (i = 0; i < 30; i++)
+    {
+      chompy_info_0.teeth[i].r = chompy_info_0.teeth[i].g
+        = chompy_info_0.teeth[i].b = 0;
+    }
+  
   /* Teeth.  */
   chompy_info_0.tooth.shader = create_program_with_shaders ("teeth.vtx",
     "teeth.frag");
@@ -123,6 +164,8 @@ init_chompy (void *params, display_info *disp)
   chompy_info_0.tooth.u_lightpos
     = get_uniform_location (chompy_info_0.tooth.shader, "u_lightpos");
   printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
+  chompy_info_0.tooth.u_toothcolour
+    = get_uniform_location (chompy_info_0.tooth.shader, "u_toothcolour");
   
   /* Gum.  */
   chompy_info_0.gum.shader = create_program_with_shaders ("gum.vtx",
@@ -188,6 +231,29 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   ttd_point3d light0_t;
   GLfloat chomp[16];
   GLfloat xlate[16];
+  int i;
+  static int last_beat = -1;
+  int beat = sync->bar * 4 + (int) (sync->bar_pos * 4);
+  float angle = (float) sync->time_offset / 1000.0;
+  float angle2 = 0.5 + 0.5 * cosf (sync->bar_pos * 2 * M_PI);
+
+  for (i = 0; i < 30; i++)
+    {
+      chompy_info_0.teeth[i].r *= 0.90;
+      chompy_info_0.teeth[i].g *= 0.90;
+      chompy_info_0.teeth[i].b *= 0.90;
+    }
+
+  if (last_beat != beat)
+    {
+      for (i = 0; i < 30; i++)
+        {
+	  chompy_info_0.teeth[i].r = drand48 ();
+	  chompy_info_0.teeth[i].g = drand48 ();
+	  chompy_info_0.teeth[i].b = drand48 ();
+	}
+      last_beat = beat;
+    }
 
   transform_lookat4 (view, &(ttd_point3d) { 0, 0, 15 },
 		     &(ttd_point3d) { 0, 0, 0 },
@@ -205,8 +271,6 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
 
   transform_identity4 (model);
   transform_identity4 (ident);
-
-  angle2 = 0.5 + 0.5 * sinf (angle * 10);
 
   transform_translate4_mat (xlate, 0, 0, 3.5);
   transform_rotate4_mat (chomp, 1, 0, 0, angle2 / 2);

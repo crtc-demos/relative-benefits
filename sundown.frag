@@ -14,7 +14,7 @@ vec4 sun1 (void)
   vec4 sky;
   float g = smoothstep (0.05, 0.06,
 			dist (v_texcoord[0], v_texcoord[1], 0.5,
-			      u_time / 10.0));
+			      u_time / 20.0));
   return mix (vec4 (1.0, 1.0, 0.0, 1.0), vec4 (0.0, 0.8, 1.0, 1.0), g);
 }
 
