@@ -210,6 +210,17 @@ main (int argc, char *argv[])
 
   disp.width = width;
   disp.height = height;
+  
+  if ((float) width / (float) height > 1.5)
+    {
+      printf ("Widescreen mode activated!\n");
+      disp.borders = 1;
+    }
+  else
+    {
+      printf ("Non-widescreen mode\n");
+      disp.borders = 0;
+    }
 
   omxaudio_init ();
   {

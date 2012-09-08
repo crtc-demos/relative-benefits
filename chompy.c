@@ -410,7 +410,7 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
       glUseProgram (chompy_info_0.greet.shader);
       glUniform1i (chompy_info_0.greet.s_texture, 1);
       glBlendFunc (GL_ONE, GL_ONE);
-      render_screen_quad (disp, chompy_info_0.greet.u_mvp);
+      render_screen_quad (disp, chompy_info_0.greet.u_mvp, disp->borders);
     }
   
   glDisable (GL_BLEND);

@@ -51,13 +51,13 @@ static GLfloat triangles[] =
      1.0,  1.0, 0.0, 1.0, 0.0 };
 
 void
-render_screen_quad (display_info *disp, GLint mvp_uniform)
+render_screen_quad (display_info *disp, GLint mvp_uniform, int borders)
 {
   GLfloat ortho[16];
   GLfloat view[16];
   GLfloat mvp[16];
-
-  transform_ortho4 (ortho, -1, 1, -1, 1, 1, 200);
+  float sides = borders ? 4.0 / 3.0 : 1.0;
+  transform_ortho4 (ortho, -sides, sides, -1, 1, 1, 200);
   //transform_perspective4 (ortho, 60, 1.33, 1.0, 200.0);
   
   transform_lookat4 (view, &(ttd_point3d) { 0, 0, 15 },
@@ -90,7 +90,7 @@ display_sundown (sync_info *sync, void *params, int iparam, display_info *disp)
   glUniform1i (sundown_info_0.s_texture, 0);
   glUniform1f (sundown_info_0.u_time, (float) sync->time_offset / 1000.0);
 
-  render_screen_quad (disp, sundown_info_0.u_mvp);
+  render_screen_quad (disp, sundown_info_0.u_mvp, disp->borders);
 }
 
 effect_methods sundown_methods =

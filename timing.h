@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
   int width;
   int height;
+  int borders;
 } display_info;
 
 typedef struct {
