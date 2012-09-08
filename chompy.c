@@ -35,6 +35,10 @@ draw_object (object_info *obj)
 {
  // glUseProgram (obj->shader_program);
 
+  glDisableVertexAttribArray (0);
+  glDisableVertexAttribArray (1);
+  glDisableVertexAttribArray (2);
+
   if ((obj->attrs & ATTR_MASK_POS) != 0)
     {
       glVertexAttribPointer (obj->attr.pos, 3, GL_FLOAT, GL_FALSE,
