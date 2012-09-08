@@ -211,7 +211,7 @@ main (int argc, char *argv[])
   disp.width = width;
   disp.height = height;
   
-  if ((float) width / (float) height > 1.5)
+  if ((float) width / (float) height > 1.6)
     {
       printf ("Widescreen mode activated!\n");
       disp.borders = 1;
