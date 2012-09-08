@@ -19,11 +19,11 @@ preinit_chompy (void)
 {
   int width, height, alpha;
   char *imgdata;
-  
+
   imgdata = readpng_image ("wood.png", &width, &height, &alpha);
   chompy_info_0.texture = readpng_bindgl2d (imgdata, width, height, alpha);
   free (imgdata);
-  
+
   imgdata = readpng_image ("greets.png", &width, &height, &alpha);
   chompy_info_0.greet.texture = readpng_bindgl2d (imgdata, width, height,
 						  alpha);
@@ -63,102 +63,158 @@ draw_object (object_info *obj)
   glDrawArrays (GL_TRIANGLE_STRIP, 0, obj->striplength);
 }
 
-void
-tooth_colour (int i)
-{
-  glUniform4f (chompy_info_0.tooth.u_toothcolour, chompy_info_0.teeth[i].r,
-    chompy_info_0.teeth[i].g, chompy_info_0.teeth[i].b, 0);
-}
-
-void
-top_teeth (void)
-{
-  //draw_object (&topgum_obj);
-  tooth_colour (0);
-  draw_object (&tl1_obj);
-  tooth_colour (1);
-  draw_object (&tl2_obj);
-  tooth_colour (2);
-  draw_object (&tl3_obj);
-  tooth_colour (3);
-  draw_object (&tl4_obj);
-  tooth_colour (4);
-  draw_object (&tl5_obj);
-  tooth_colour (5);
-  draw_object (&tl6_obj);
-  tooth_colour (6);
-  draw_object (&tl7_obj);
-  tooth_colour (7);
-  draw_object (&tr1_obj);
-  tooth_colour (8);
-  draw_object (&tr2_obj);
-  tooth_colour (9);
-  draw_object (&tr3_obj);
-  tooth_colour (10);
-  draw_object (&tr4_obj);
-  tooth_colour (11);
-  draw_object (&tr5_obj);
-  tooth_colour (12);
-  draw_object (&tr6_obj);
-  tooth_colour (13);
-  draw_object (&tr7_obj);
-}
-
-void
-bottom_teeth (void)
-{
-//draw_object (&bottomgum_obj);
-  tooth_colour (14);
-  draw_object (&bl1_obj);
-  tooth_colour (15);
-  draw_object (&bl2_obj);
-  tooth_colour (16);
-  draw_object (&bl3_obj);
-  tooth_colour (17);
-  draw_object (&bl4_obj);
-  tooth_colour (18);
-  draw_object (&bl5_obj);
-  tooth_colour (19);
-  draw_object (&bl6_obj);
-  tooth_colour (20);
-  draw_object (&bl7_obj);
-  tooth_colour (21);
-  draw_object (&bl8_obj);
-  tooth_colour (22);
-  draw_object (&br1_obj);
-  tooth_colour (23);
-  draw_object (&br2_obj);
-  tooth_colour (24);
-  draw_object (&br3_obj);
-  tooth_colour (25);
-  draw_object (&br4_obj);
-  tooth_colour (26);
-  draw_object (&br5_obj);
-  tooth_colour (27);
-  draw_object (&br6_obj);
-  tooth_colour (28);
-  draw_object (&br7_obj);
-  tooth_colour (29);
-  draw_object (&br8_obj);
-}
-
 #define GREET_ATTR_POS 0
 #define GREET_ATTR_TEX 1
 
+static GLfloat view[16];
+static GLfloat model[16];
+static GLfloat modelview[16];
+static GLfloat inv_modelview[16];
+static GLfloat ident[16];
+static GLfloat chomp[16];
+static GLfloat xlate[16];
+static GLfloat xlate[16];
 static GLfloat perspective[16];
 static GLfloat mvp[16];
+
+void
+draw_dent (sync_info *sync, dent* d, int bottom, int i);
+
+void
+draw_dent (sync_info *sync, dent* d, int bottom, int i)
+{
+  ttd_point3d light0 = { 20, 20, -20 };
+  ttd_point3d light0_t;
+  int bar = sync->bar;
+  uint32_t time_offset = sync->time_offset;
+  float angle = (float) sync->time_offset / 1000.0;
+  float angle2 = 0.5 + 0.5 * cosf (sync->bar_pos * 2 * M_PI);
+
+  transform_identity4 (model);
+  transform_identity4 (ident);
+
+  transform_translate4_mat (xlate, 0, 0, 3.5);
+  transform_rotate4_mat (chomp, 1, 0, 0, angle2 / 2);
+
+  transform_mul4 (model, chomp, xlate);
+  transform_translate4_mat (xlate, 0, chompy_info_0.drop, -3.5);
+  transform_mul4 (model, xlate, model);
+
+  transform_rotate4_mat (xlate, 0, 1, 0, angle);
+  transform_mul4 (model, xlate, model);
+  if (!bottom)
+    {
+      transform_translate4_mat (xlate, 0, 0, 3.5);
+      transform_rotate4_mat (chomp, 1, 0, 0, -angle2 / 3);
+
+      transform_mul4 (model, chomp, xlate);
+      transform_translate4_mat (xlate, 0, chompy_info_0.drop, -3.5);
+      transform_mul4 (model, xlate, model);
+
+      transform_rotate4_mat (xlate, 0, 1, 0, angle);
+      transform_mul4 (model, xlate, model);
+    }
+
+  /* Translate to tooth-specific location.  */
+  transform_translate4_mat (xlate, d->x, d->y, d->z);
+  transform_mul4 (model, xlate, model);
+
+  transform_mul4 (modelview, view, model);
+  transform_invert4 (inv_modelview, modelview);
+  transform_point4 (&light0_t, inv_modelview, &light0);
+  transform_mul4 (mvp, perspective, modelview);
+
+  glUseProgram (chompy_info_0.tooth.shader);
+
+
+  glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
+               light0_t.z);
+  glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
+
+  glUniform4f (chompy_info_0.tooth.u_toothcolour, d->r, d->g, d->b, 0);
+  draw_object(d->obj);
+
+
+  /* Update tooth location.  */
+  d->x += d->vx;
+  d->y += d->vy;
+  d->z += d->vz;
+
+  /* Update tooth velocity.  */
+  static const float force = 0.1f;
+  static const float friction = 0.02f;
+  d->vx += (d->tx - d->x)*force - d->vx*friction;
+  d->vy += (d->ty - d->y)*force - d->vy*friction;
+  d->vz += (d->tz - d->z)*force - d->vz*friction;
+
+  /* Update tooth target location.  */
+  if (bar == 27 && !d->randomized)
+    {
+      d->randomized = 1;
+      d->tx = (drand48()*5.0-2.5);
+      d->ty = (drand48()*5.0-2.5);
+      d->tz = (drand48()*5.0-2.5);
+    }
+
+  if (bar >= 30 && bar < 35)
+    {
+      float angle = (float)time_offset / 250.0 + i*0.2f;
+      d->tx = 2.5f*sinf(angle)/5.0f;
+      d->ty = 2.5f*cosf(angle)/5.0f;
+      d->tz = 0;
+    }
+
+  if (bar == 35)
+    {
+      d->tx = d->ty = d->tz = 0;
+    }
+}
 
 void
 init_chompy (void *params, display_info *disp)
 {
   int i;
-  
+
   for (i = 0; i < 30; i++)
     {
-      chompy_info_0.teeth[i].r = chompy_info_0.teeth[i].g
-        = chompy_info_0.teeth[i].b = 0;
+      dent *d = &chompy_info_0.teeth[i];
+      d->r = d->g = d->b = 0;
+      d->x = d->y = d->z = 0;
+      d->vx = d->vy = d->vz = 0;
+      d->tx = d->ty = d->tz = 0;
+      d->randomized = 0;
     }
-  
+  chompy_info_0.teeth[0].obj = &tl1_obj;
+  chompy_info_0.teeth[1].obj = &tl2_obj;
+  chompy_info_0.teeth[2].obj = &tl3_obj;
+  chompy_info_0.teeth[3].obj = &tl4_obj;
+  chompy_info_0.teeth[4].obj = &tl5_obj;
+  chompy_info_0.teeth[5].obj = &tl6_obj;
+  chompy_info_0.teeth[6].obj = &tl7_obj;
+  chompy_info_0.teeth[7].obj = &tr1_obj;
+  chompy_info_0.teeth[8].obj = &tr2_obj;
+  chompy_info_0.teeth[9].obj = &tr3_obj;
+  chompy_info_0.teeth[10].obj = &tr4_obj;
+  chompy_info_0.teeth[11].obj = &tr5_obj;
+  chompy_info_0.teeth[12].obj = &tr6_obj;
+  chompy_info_0.teeth[13].obj = &tr7_obj;
+  chompy_info_0.teeth[14].obj = &bl1_obj;
+  chompy_info_0.teeth[15].obj = &bl2_obj;
+  chompy_info_0.teeth[16].obj = &bl3_obj;
+  chompy_info_0.teeth[17].obj = &bl4_obj;
+  chompy_info_0.teeth[18].obj = &bl5_obj;
+  chompy_info_0.teeth[19].obj = &bl6_obj;
+  chompy_info_0.teeth[20].obj = &bl7_obj;
+  chompy_info_0.teeth[21].obj = &bl8_obj;
+  chompy_info_0.teeth[22].obj = &br1_obj;
+  chompy_info_0.teeth[23].obj = &br2_obj;
+  chompy_info_0.teeth[24].obj = &br3_obj;
+  chompy_info_0.teeth[25].obj = &br4_obj;
+  chompy_info_0.teeth[26].obj = &br5_obj;
+  chompy_info_0.teeth[27].obj = &br6_obj;
+  chompy_info_0.teeth[28].obj = &br7_obj;
+  chompy_info_0.teeth[29].obj = &br8_obj;
+
   /* Teeth.  */
   chompy_info_0.tooth.shader = create_program_with_shaders ("teeth.vtx",
     "teeth.frag");
@@ -179,7 +235,7 @@ init_chompy (void *params, display_info *disp)
   //printf ("u_lightpos uniform number: %d\n", chompy_info_0.tooth.u_lightpos);
   chompy_info_0.tooth.u_toothcolour
     = get_uniform_location (chompy_info_0.tooth.shader, "u_toothcolour");
-  
+
   /* Gum.  */
   chompy_info_0.gum.shader = create_program_with_shaders ("gum.vtx",
     "gum.frag");
@@ -209,7 +265,7 @@ init_chompy (void *params, display_info *disp)
 			"a_texcoord");
 
   link_and_check (chompy_info_0.wood.shader);
-  
+
   chompy_info_0.wood.u_mvp = get_uniform_location (chompy_info_0.wood.shader,
 						   "u_mvp");
   chompy_info_0.wood.s_texture
@@ -234,7 +290,7 @@ init_chompy (void *params, display_info *disp)
   chompy_info_0.glass.u_mvp = get_uniform_location (chompy_info_0.glass.shader,
  						    "u_mvp");
   chompy_info_0.drop = 20.0;
-  
+
   /* Set up greetings shader.  */
   chompy_info_0.greet.shader = create_program_with_shaders ("sundown.vtx",
     "greet.frag");
@@ -252,15 +308,8 @@ init_chompy (void *params, display_info *disp)
 void
 display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
 {
-  GLfloat view[16];
-  GLfloat model[16];
-  GLfloat modelview[16];
-  GLfloat inv_modelview[16];
-  GLfloat ident[16];
   ttd_point3d light0 = { 20, 20, -20 };
   ttd_point3d light0_t;
-  GLfloat chomp[16];
-  GLfloat xlate[16];
   int i;
   static int last_beat = -1;
   int beat = sync->bar * 4 + (int) (sync->bar_pos * 4);
@@ -271,18 +320,20 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
     {
       for (i = 0; i < 30; i++)
 	{
-	  chompy_info_0.teeth[i].r *= 0.90;
-	  chompy_info_0.teeth[i].g *= 0.90;
-	  chompy_info_0.teeth[i].b *= 0.90;
+          dent* d = &chompy_info_0.teeth[i];
+          d->r *= 0.90;
+          d->g *= 0.90;
+          d->b *= 0.90;
 	}
 
       if (last_beat != beat && sync->bar <= 30)
 	{
 	  for (i = 0; i < 30; i++)
             {
-	      chompy_info_0.teeth[i].r = drand48 ();
-	      chompy_info_0.teeth[i].g = drand48 ();
-	      chompy_info_0.teeth[i].b = drand48 ();
+              dent* d = &chompy_info_0.teeth[i];
+              d->r = drand48 ();
+              d->g = drand48 ();
+              d->b = drand48 ();
 	    }
 	  last_beat = beat;
 	}
@@ -325,13 +376,9 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
 
       draw_object (&bottomgum_obj);
 
-      glUseProgram (chompy_info_0.tooth.shader);
-
-      glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
-		   light0_t.z);
-      glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
-
-      bottom_teeth ();
+      for (i = 14; i < 30; ++i) {
+        draw_dent(sync, &chompy_info_0.teeth[i], 1, i);
+      }
 
       glUseProgram (chompy_info_0.gum.shader);
 
@@ -344,11 +391,6 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
       transform_mul4 (model, chomp, xlate);
       transform_translate4_mat (xlate, 0, chompy_info_0.drop, -3.5);
       transform_mul4 (model, xlate, model);
-
-      if (chompy_info_0.drop <= 0.5)
-        chompy_info_0.drop = 0.0;
-      else if (chompy_info_0.drop > 0)
-        chompy_info_0.drop -= 0.5;
 
    //   printf ("%f\n", chompy_info_0.drop);
 
@@ -363,13 +405,17 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
 
       draw_object (&topgum_obj);
 
-      glUseProgram (chompy_info_0.tooth.shader);
+      for (i = 0; i < 14; ++i) {
+        draw_dent(sync, &chompy_info_0.teeth[i], 0, i);
+      }
 
-      glUniform3f (chompy_info_0.tooth.u_lightpos, light0_t.x, light0_t.y,
-		   light0_t.z);
-      glUniformMatrix4fv (chompy_info_0.tooth.u_mvp, 1, GL_FALSE, mvp);
 
-      top_teeth ();
+      if (chompy_info_0.drop <= 0.5)
+        chompy_info_0.drop = 0.0;
+      else if (chompy_info_0.drop > 0)
+        chompy_info_0.drop -= 0.5;
+
+   //   printf ("%f\n", chompy_info_0.drop);
     }
 
   /*transform_identity4 (model);
@@ -379,40 +425,40 @@ display_chompy (sync_info *sync, void *params, int iparam, display_info *disp)
   transform_point4 (&light0_t, inv_modelview, &light0);
   transform_mul4 (mvp, perspective, modelview);
   glUniformMatrix4fv (u_mvp, 1, GL_FALSE, mvp);*/
-  
+
   glUseProgram (chompy_info_0.wood.shader);
-  
+
   transform_rotate4_mat (model, 0, 1, 0, angle);
   transform_mul4 (modelview, view, model);
   transform_mul4 (mvp, perspective, modelview);
   glUniformMatrix4fv (chompy_info_0.wood.u_mvp, 1, GL_FALSE, mvp);
-  
+
   glUniform1i (chompy_info_0.wood.s_texture, 0);
-  
+
   draw_object (&table_obj);
-  
+
   glUseProgram (chompy_info_0.glass.shader);
 
   glUniformMatrix4fv (chompy_info_0.glass.u_mvp, 1, GL_FALSE, mvp);
-  
+
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   //glBlendFunc (GL_ONE, GL_ONE);
   //glDepthMask (GL_FALSE);
-  
+
   glCullFace (GL_FRONT);
   draw_object (&glass_obj);
   glCullFace (GL_BACK);
   draw_object (&glass_obj);
-  
-  if (sync->bar >= 32)
+
+  if (sync->bar >= 40)
     {
       glUseProgram (chompy_info_0.greet.shader);
       glUniform1i (chompy_info_0.greet.s_texture, 1);
       glBlendFunc (GL_ONE, GL_ONE);
       render_screen_quad (disp, chompy_info_0.greet.u_mvp, disp->borders);
     }
-  
+
   glDisable (GL_BLEND);
   glEnable (GL_CULL_FACE);
   glDepthMask (GL_TRUE);

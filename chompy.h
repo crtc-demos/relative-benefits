@@ -3,6 +3,16 @@
 
 #include "timing.h"
 
+typedef struct
+{
+  float r, g, b;
+  float x, y, z;
+  float vx, vy, vz;
+  float tx, ty, tz;
+  object_info *obj;
+  int randomized;
+} dent;
+
 typedef struct {
   GLint texture;
   struct {
@@ -11,9 +21,7 @@ typedef struct {
     GLint u_lightpos;
     GLint u_toothcolour;
   } tooth;
-  struct {
-    float r, g, b;
-  } teeth[30];
+  dent teeth[30];
   struct {
     GLuint shader;
     GLint u_mvp;
