@@ -224,7 +224,7 @@ main (int argc, char *argv[])
 
   omxaudio_init ();
   {
-    OMX_ERRORTYPE err = omxaudio_load ("/home/pi/pidemo/crtc3.wav");
+    OMX_ERRORTYPE err = omxaudio_load ("crtc3.wav");
     if (err != OMX_ErrorNone)
       {
         fprintf (stderr, "OMX playback failed to initialise (%x)\n", err);
